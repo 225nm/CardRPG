@@ -78,9 +78,8 @@ export class Player {
       return;
     }
     cards.forEach((card, index) => {
-      // ✅ Loop over the retrieved array
       console.log(
-        `  [${index + 1}] ${card.toString()} (Rank Value: ${card.getRankWeight()}, Suit: ${card.getSuit()})`,
+        `  [${index + 1}] ${card.toString()} `,
       );
     });
   }
