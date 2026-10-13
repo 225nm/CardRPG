@@ -1,9 +1,14 @@
 export class CombatUI {
+  #player;
+  #enemy;
+  #deck;
+  #discard;
+
   constructor(player, enemy, deck, discard) {
-    this.player = player;
-    this.enemy = enemy;
-    this.deck = deck;
-    this.discard = discard;
+    this.#player = player;
+    this.#enemy = enemy;
+    this.#deck = deck;
+    this.#discard = discard;
   }
 
   render() {
@@ -19,13 +24,13 @@ export class CombatUI {
     const bold = "\x1b[1m";
 
     // 1. Pad raw strings first so border alignments remain exact
-    const hName = (this.player.name || "Player1").padEnd(13);
-    const eName = (this.enemy.name || "Goblin").padEnd(13);
-    const hHp = `${this.player.getHp()}/${this.player.maxHp}`.padEnd(7);
-    const eHp = `${this.enemy.getHp()}/${this.enemy.maxHp}`.padEnd(7);
-    const hArmour = String(this.player.getArmour()).padEnd(3);
-    const deckCount = String(this.deck.remainingDeckSize()).padEnd(3);
-    const discardCount = String(this.discard.getPileSize()).padEnd(3);
+    const hName = (this.#player.getName() || "Player1").padEnd(13);
+    const eName = (this.#enemy.getName() || "Goblin").padEnd(13);
+    const hHp = `${this.#player.getHp()}/${this.#player.getMaxHp()}`.padEnd(7);
+    const eHp = `${this.#enemy.getHp()}/${this.#enemy.getMaxHp()}`.padEnd(7);
+    const hArmour = String(this.#player.getArmour()).padEnd(3);
+    const deckCount = String(this.#deck.remainingDeckSize()).padEnd(3);
+    const discardCount = String(this.#discard.getPileSize()).padEnd(3);
 
     // 2. Build layout text blocks
     const leftCol1 = ` HERO: ${hName}`.padEnd(26);

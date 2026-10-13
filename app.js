@@ -61,7 +61,7 @@ async function startGame() {
     combatUI.render();
     player.renderHand();
 
-    const handCards = player.hand.getCards();
+    const handCards = player.getHand().getCards();
 
     const rawInput = await getSingleKey(
       "\n Enter the number of the card to play: ",
@@ -88,14 +88,14 @@ async function startGame() {
     gameLogic.resolve(playedCard);
 
     if (!enemy.isAlive()) {
-      console.log(`\n ${enemy.name} has been defeated!`);
+      console.log(`\n ${enemy.getName()} has been defeated!`);
       break;
     }
 
     enemy.takeTurn(player, rng);
 
     if (!player.isAlive()) {
-      console.log(`\n ${player.name} has been defeated!`);
+      console.log(`\n ${player.getName()} has been defeated!`);
       break;
     }
 

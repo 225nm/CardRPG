@@ -14,12 +14,12 @@ export class Goblin extends Enemy {
   }
 
   attack(target) {
-    console.log(`\n👹 ${this.name} swings a rusty blade at ${target.name}!`);
-    target.takeDamage(this.attackPower);
+    console.log(`\n👹 ${this.getName()} swings a rusty blade at ${target.getName()}!`);
+    target.takeDamage(this.getAttackPower());
   }
 
   special() {
-    console.log(`\n⚡ ${this.name} ${this.specialName} and takes 2 damage`);
-    this.takeDamage(2)
+    console.log(`\n⚡ ${this.getName()} ${this.getSpecialName()} and takes 2 damage`);
+    this.takeDamage(2);
   }
 }
