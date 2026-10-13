@@ -3,7 +3,7 @@ export class Enemy {
   #name;
   #maxHp;
   #hp;
-  #attackPower;
+  #power;
   #specialName;
   #target;
   #specialTarget;
@@ -13,7 +13,7 @@ export class Enemy {
     this.#name = name;
     this.#maxHp = maxHp;
     this.#hp = maxHp;
-    this.#attackPower = power;
+    this.#power = power;
     this.#specialName = specialName;
     this.#target = target;
     this.#specialTarget = specialTarget;
@@ -32,8 +32,8 @@ export class Enemy {
     return this.#hp;
   }
 
-  getAttackPower() {
-    return this.#attackPower;
+  getPower() {
+    return this.#power;
   }
 
   getSpecialName() {

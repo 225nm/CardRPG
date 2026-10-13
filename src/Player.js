@@ -1,6 +1,6 @@
 import { Hand } from "DeckLib";
 
-// Player class holding name, hand and hp, hp is an abbreviation for health points.
+// Player class, hp is an abbreviation for health points.
 export class Player {
   #name;
   #maxHp;
