@@ -14,6 +14,10 @@ export class Player {
     return this.hp;
   }
 
+  isAlive() {
+    return this.hp > 0;
+  }
+
   getArmour() {
     return this.armour;
   }
@@ -51,9 +55,12 @@ export class Player {
   }
 
   addCardToHand(cards) {
-    this.hand.addCard(cards);
+    if (Array.isArray(cards)) {
+      cards.forEach((card) => this.hand.addCard(card));
+    } else {
+      this.hand.addCard(cards);
+    }
   }
-
   playCardByIndex(index, discardPile) {
     const cards = this.hand.getCards();
     if (index < 0 || index >= cards.length) {
@@ -78,9 +85,7 @@ export class Player {
       return;
     }
     cards.forEach((card, index) => {
-      console.log(
-        `  [${index + 1}] ${card.toString()} `,
-      );
+      console.log(`  [${index + 1}] ${card.toString()} `);
     });
   }
 }
