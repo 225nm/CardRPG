@@ -4,9 +4,10 @@
   "main": "app.js",
   "type": "module",
   "dependencies": {
-    "DeckLib": "github:225nm/decklib"
+    "DeckLib": "github:225nm/decklib",
+    "dice-rng-toolkit": "github:THJoker3/dice-rng-toolkit"
   },
-    "scripts": {
+  "scripts": {
     "start": "node app.js"
   }
 }
