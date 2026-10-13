@@ -26,7 +26,7 @@ The application will be written in plain JS and includes at minimum two student 
 
 # Base requirement list
 
-- Your deck should be improved with rewards from defeating enemies.
+- The player deck should be improved with rewards from defeating enemies.
 - There should be multiple enemies to fight.
 - Game logic and data should be presented in a clear manner.
 - Cards should perform different effects when played.
