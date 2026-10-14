@@ -26,9 +26,10 @@ export class RewardLogic {
     const uWeight = 0.3;
     const rWeight = 0.1;
 
+    // Selects cards randomly from the correct pool based on the random roll from rng.nextFloat (0-1)
     for (let i = 0; i < amount; i++) {
       let roll = rng.nextFloat();
-      let Pool;
+      let Pool = this.#CommonCards;
       if (roll < cWeight) {
         Pool = this.#CommonCards;
       } else if (roll < cWeight + uWeight) {
