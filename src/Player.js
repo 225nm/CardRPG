@@ -48,7 +48,7 @@ export class Player {
       this.#armour -= absorbed;
       unblockedDamage -= absorbed;
       console.log(
-        `🛡️ Armour absorbed ${absorbed} damage! (Armour left: ${this.#armour})`,
+        `🛡️  Armour absorbed ${absorbed} damage! (Armour left: ${this.#armour})`,
       );
     }
     if (unblockedDamage > 0) {
@@ -69,7 +69,7 @@ export class Player {
   addArmour(amount) {
     this.#armour += amount;
     console.log(
-      `🛡️ ${this.#name} gains ${amount} armour! (Total Armour: ${this.#armour})`,
+      `🛡️  ${this.#name} gains ${amount} armour! (Total Armour: ${this.#armour})`,
     );
   }
 
@@ -89,7 +89,7 @@ export class Player {
     }
     const cardToPlay = cards[index];
     this.#hand.playCard(cardToPlay, discardPile);
-    console.log(`⚔️ Played ${cardToPlay.toString()} from hand.`);
+    console.log(`⚔️  Played ${cardToPlay.toString()} from hand.`);
     return cardToPlay;
   }
 

@@ -43,7 +43,7 @@ async function startGame() {
   const discard = new DiscardPile();
 
   // Initialize enemy
-  const enemy = new EnemyIndex.Goblin();
+  const enemy = new EnemyIndex.Knight();
 
   const gameLogic = new GameLogic(player, enemy, deck, discard, rng, d6);
   const combatUI = new CombatUI(player, enemy, deck, discard);

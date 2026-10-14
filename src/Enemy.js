@@ -66,7 +66,7 @@ export class Enemy {
   takeTurn(player, rng) {
     const luckRoll = rng.nextFloat();
     if (luckRoll < this.#luck) {
-      this.special();
+      this.special(player);
     } else {
       this.attack(player);
     }
