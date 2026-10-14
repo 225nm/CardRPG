@@ -54,7 +54,7 @@ export class Player {
     if (unblockedDamage > 0) {
       this.#hp = Math.max(0, this.#hp - unblockedDamage);
       console.log(
-        `💥 ${this.#name} takes ${amount} damage! (HP: ${this.#hp}/${this.#maxHp})`,
+        `💥 ${this.#name} takes ${unblockedDamage} damage! (HP: ${this.#hp}/${this.#maxHp})`,
       );
     }
   }
