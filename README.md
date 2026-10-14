@@ -1,6 +1,6 @@
 # CardRPG (name in progress)
 
-CardRPG is a turn based RPG build using Javascript in Node and uses standard playing cards and dice.
+CardRPG is a turn based deckbuilder RPG built using Javascript in Node and uses standard playing cards and dice.
 
 - Spades represent physical attacks.
 - Hearts represent healing
@@ -13,8 +13,23 @@ CardRPG is a turn based RPG build using Javascript in Node and uses standard pla
 - dice-rng-toolkit: https://github.com/ThJoker3/Dice-RNG-Toolkit
 
 # Installation
+## Open a terminal in the folder where you want the game to exist, git bash recommended and enter the following commands:
+### Clone the repo
+```
+git clone https://github.com/225nm/CardRPG.git
+```
+### Install dependencies
+``` install dependencies
+npm i
+```
+### Start the game
+``` start the game
+npm start
+```
 
-TODO
+# Controls
+Use the number keys to select cards to play or rewards.
+Press q to exit the game.
 
 # Project Vision
 
