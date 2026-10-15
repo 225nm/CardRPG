@@ -9,6 +9,54 @@ import { CommonCards, UncommonCards, RareCards } from "./src/Loot.js";
 import { RewardLogic } from "./src/RewardLogic.js";
 import { getSingleKey } from "./src/InputLogic.js";
 
+function createCombatHandlers(player, enemy, deck, discard, rng, d6) {
+  return {
+    gameLogic: new GameLogic(player, enemy, deck, discard, rng, d6),
+    combatUI: new CombatUI(player, enemy, deck, discard),
+  };
+}
+
+function announceEnemyDefeat(enemy, enemiesDefeated) {
+  enemiesDefeated++;
+  console.log(`\n${enemy.getName()} has been defeated!`);
+  console.log(`You have defeated ${enemiesDefeated} enemies`);
+  return enemiesDefeated;
+}
+
+async function addRewardToDeck(rewardLogic, discard) {
+  const rewards = rewardLogic.generateRewards(3);
+  const selectedReward = await rewardLogic.chooseReward(rewards);
+  console.log("REWARDS:" + rewards);
+  console.log(selectedReward);
+  discard.addCard(selectedReward);
+  console.log(`\n✨ Added ${selectedReward.toString()} to your deck!`);
+}
+
+function discardRemainingHand(player, discard) {
+  const hand = player.getHand();
+  const remainingHand = [...hand.getCards()];
+
+  for (const card of remainingHand) {
+    hand.removeCard(card);
+    discard.addCard(card);
+  }
+}
+
+function drawNextHand(player, deck, discard) {
+  if (discard.getPileSize() > 0) {
+    deck.reshuffleDiscardPile(discard);
+  } else {
+    deck.shuffle();
+  }
+
+  player.addCardToHand(deck.drawMultiple(3));
+}
+
+function spawnEnemy(randomizer, rng) {
+  const Enemy = randomizer.pick(Object.values(EnemyIndex), rng);
+  return new Enemy();
+}
+
 async function startGame() {
   // Initialize random handlers
   const rng = new RandomGenerator();
@@ -27,8 +75,14 @@ async function startGame() {
   // Initialize enemy
   let enemy = new EnemyIndex.Goblin();
 
-  let gameLogic = new GameLogic(player, enemy, deck, discard, rng, d6);
-  let combatUI = new CombatUI(player, enemy, deck, discard);
+  let { gameLogic, combatUI } = createCombatHandlers(
+    player,
+    enemy,
+    deck,
+    discard,
+    rng,
+    d6,
+  );
   const rewardLogic = new RewardLogic(CommonCards, UncommonCards, RareCards);
 
   console.log("=== Welcome to CardRPG, press q at any time to exit ===");
@@ -71,39 +125,21 @@ async function startGame() {
     const playedCard = player.playCardByIndex(choice, discard);
     gameLogic.resolve(playedCard);
 
-    // Awards loot and spawns a new enemy if the current one has been defeated, TODO refactor into smaller functions
     if (!enemy.isAlive()) {
-      enemiesDefeated++;
-      console.log(`\n${enemy.getName()} has been defeated!`);
-      console.log(`You have defeated ${enemiesDefeated} enemies`);
-      const rewards = rewardLogic.generateRewards(3);
-      const selectedReward = await rewardLogic.chooseReward(rewards);
-      console.log("REWARDS:" + rewards);
-      console.log(selectedReward);
-      discard.addCard(selectedReward);
-      console.log(`\n✨ Added ${selectedReward.toString()} to your deck!`);
+      enemiesDefeated = announceEnemyDefeat(enemy, enemiesDefeated);
+      await addRewardToDeck(rewardLogic, discard);
+      discardRemainingHand(player, discard);
+      drawNextHand(player, deck, discard);
 
-      // TODO break out into helper function
-      // Discards hand, shuffles deck and deals a new hand of 3 cards
-      const hand = player.getHand();
-      const remainingHand = [...hand.getCards()];
-      for (const card of remainingHand) {
-        hand.removeCard(card);
-        discard.addCard(card);
-      }
-      if (discard.getPileSize() > 0) {
-        deck.reshuffleDiscardPile(discard);
-      } else {
-        deck.shuffle();
-      }
-      player.addCardToHand(deck.drawMultiple(3));
-
-      const nextEnemy = randomizer.pick(Object.values(EnemyIndex), rng);
-      enemy = new nextEnemy();
-
-      // TODO make a function for this in order to enforce DRY.
-      gameLogic = new GameLogic(player, enemy, deck, discard, rng, d6);
-      combatUI = new CombatUI(player, enemy, deck, discard);
+      enemy = spawnEnemy(randomizer, rng);
+      ({ gameLogic, combatUI } = createCombatHandlers(
+        player,
+        enemy,
+        deck,
+        discard,
+        rng,
+        d6,
+      ));
 
       continue;
     }
