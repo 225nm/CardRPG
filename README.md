@@ -41,10 +41,10 @@ AI agents and tools will be used to assist with the programming, especially with
 
 # Base requirement list
 
-- The player deck should be improved with rewards from defeating enemies.
-- There should be multiple enemies to fight.
-- Game logic and data should be presented in a clear manner.
-- Cards should perform different effects when played.
+- R1: The player deck should be improved with rewards from defeating enemies.
+- R2: There should be multiple enemies to fight.
+- R3: Game logic and data should be presented in a clear manner.
+- R4: Cards should perform different effects when played.
 
 # Automatic unit tests
 

@@ -32,7 +32,7 @@ async function captureAsyncConsoleOutput(run) {
   }
 }
 
-test("defeating an enemy adds the selected reward to the discard pile", async () => {
+test("R1: defeating an enemy adds the selected reward to the discard pile", async () => {
   const reward = new Card("Spades", "8");
   const discardedCards = [];
   const handCards = [{ name: "remaining card" }];
@@ -91,7 +91,7 @@ test("defeating an enemy adds the selected reward to the discard pile", async ()
   assert.ok(Object.values(EnemyIndex).some((Enemy) => result.enemy instanceof Enemy));
 });
 
-test("the enemy index provides multiple distinct enemies", () => {
+test("R2: the enemy index provides multiple distinct enemies", () => {
   const enemies = Object.values(EnemyIndex).map((Enemy) => new Enemy());
 
   assert.ok(enemies.length > 1);
@@ -102,7 +102,7 @@ test("the enemy index provides multiple distinct enemies", () => {
   assert.ok(enemies.every((enemy) => enemy.isAlive()));
 });
 
-test("combat display presents player, enemy, health, and deck information", () => {
+test("R3: combat display presents player, enemy, health, and deck information", () => {
   const player = new Player("Test Hero", 30, 4);
   const enemy = new EnemyIndex.Goblin();
   const output = captureConsoleOutput(() =>
@@ -122,7 +122,7 @@ test("combat display presents player, enemy, health, and deck information", () =
   assert.match(output, /Discard: 2/);
 });
 
-test("cards apply different effects based on their suits", () => {
+test("R4: cards apply different effects based on their suits", () => {
   const player = new Player("Test Hero", 20);
   captureConsoleOutput(() => player.takeDamage(5));
   const enemy = new EnemyIndex.Goblin();
