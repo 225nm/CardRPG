@@ -1,6 +1,6 @@
 # CardRPG (name in progress)
 
-CardRPG is a turn based deckbuilder RPG built using Javascript in Node and uses standard playing cards and dice.
+CardRPG is a CLI turn based deckbuilder RPG built using Javascript in Node and uses standard playing cards and dice.
 
 - Spades represent physical attacks.
 - Hearts represent healing
