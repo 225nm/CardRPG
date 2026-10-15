@@ -18,6 +18,10 @@ CardRPG is a CLI turn based deckbuilder RPG built using Javascript in Node and u
 ```
 git clone https://github.com/225nm/CardRPG.git
 ```
+### Navigate to the new folder
+```
+cd CardRPG
+```
 ### Install dependencies
 ``` install dependencies
 npm i
