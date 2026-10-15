@@ -83,6 +83,7 @@ export class Player {
 
   playCardByIndex(index, discardPile) {
     const cards = this.#hand.getCards();
+    // TODO fix redundant validation
     if (index < 0 || index >= cards.length) {
       console.log("❌ Invalid card index!");
       return null;
