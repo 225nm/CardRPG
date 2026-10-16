@@ -10,6 +10,13 @@ import { RewardLogic } from "./src/RewardLogic.js";
 import { getSingleKey } from "./src/InputLogic.js";
 import { completeEncounter } from "./src/EncounterLogic.js";
 
+function createCombatHandlers(player, enemy, deck, discard, rng, d6) {
+  return {
+    gameLogic: new GameLogic(player, enemy, deck, discard, rng, d6),
+    combatUI: new CombatUI(player, enemy, deck, discard),
+  };
+}
+
 async function startGame() {
   // Initialize random handlers
   const rng = new RandomGenerator();
@@ -102,23 +109,17 @@ async function startGame() {
 
       continue;
     }
-    function createCombatHandlers(player, enemy, deck, discard, rng, d6) {
-      return {
-        gameLogic: new GameLogic(player, enemy, deck, discard, rng, d6),
-        combatUI: new CombatUI(player, enemy, deck, discard),
-      };
+
+    enemy.takeTurn(player, rng);
+
+    if (!player.isAlive()) {
+      console.log(`\n 💀 ${player.getName()} has been defeated!`);
+      console.log(` You defeated ${enemiesDefeated} enemies`);
+      process.exit(0);
     }
+
+    gameLogic.endTurn();
   }
-
-  enemy.takeTurn(player, rng);
-
-  if (!player.isAlive()) {
-    console.log(`\n 💀 ${player.getName()} has been defeated!`);
-    console.log(` You defeated ${enemiesDefeated} enemies`);
-    process.exit(0);
-  }
-
-  gameLogic.endTurn();
 }
 
 startGame();
