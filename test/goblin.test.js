@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert";
-import { Goblin } from "../src/Enemies/Goblin.js";
+import { Goblin } from "../src/models/Enemies/Goblin.js";
 
 test("Goblin special method reduces HP by 2", () => {
   const goblin = new Goblin();
@@ -49,4 +49,25 @@ test("Goblin takeTurn triggers attack when luck roll is above threshold", () => 
   // HP should remain unchanged (no special self-damage) and attack should be called
   assert.strictEqual(goblin.getHp(), initialHp);
   assert.strictEqual(attackCalled, true);
+});
+
+test("Goblin is defeated when its special self-damage takes it to 0 HP", () => {
+  const goblin = new Goblin();
+  goblin.takeDamage(8);
+  const mockRng = { nextFloat: () => 0.05 };
+
+  goblin.takeTurn({}, mockRng);
+
+  assert.strictEqual(goblin.getHp(), 0);
+  assert.strictEqual(goblin.isAlive(), false);
+});
+
+test("Goblin self-damage does not take HP below 0", () => {
+  const goblin = new Goblin();
+  goblin.takeDamage(9);
+
+  goblin.special();
+
+  assert.strictEqual(goblin.getHp(), 0);
+  assert.strictEqual(goblin.isAlive(), false);
 });

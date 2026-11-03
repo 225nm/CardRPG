@@ -1,6 +1,6 @@
 import { Hand } from "DeckLib";
-import { Observable } from "./Observable.js";
-import { GameEvent } from "./GameEvents.js";
+import { Observable } from "../events/Observable.js";
+import { GameEvent } from "../events/GameEvents.js";
 
 // Player class, hp is an abbreviation for health points.
 export class Player extends Observable {

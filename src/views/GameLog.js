@@ -1,6 +1,6 @@
-import { GameEvent } from "./GameEvents.js";
-import { Goblin } from "./Enemies/Goblin.js";
-import { Knight } from "./Enemies/Knight.js";
+import { GameEvent } from "../events/GameEvents.js";
+import { Goblin } from "../models/Enemies/Goblin.js";
+import { Knight } from "../models/Enemies/Knight.js";
 
 const ATTACK_LINES = new Map([
   [

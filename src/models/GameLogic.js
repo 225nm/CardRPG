@@ -1,5 +1,11 @@
-import { Observable } from "./Observable.js";
-import { GameEvent } from "./GameEvents.js";
+import { Observable } from "../events/Observable.js";
+import { GameEvent } from "../events/GameEvents.js";
+
+export const TurnOutcome = Object.freeze({
+  CONTINUE: "continue",
+  ENEMY_DEFEATED: "enemyDefeated",
+  PLAYER_DEFEATED: "playerDefeated",
+});
 
 export class GameLogic extends Observable {
   #player;
@@ -25,6 +31,25 @@ export class GameLogic extends Observable {
 
   getEnemy() {
     return this.#enemy;
+  }
+
+  // An enemy defeated by the player's card does not get to act, but an
+  // enemy can also defeat itself during its own turn (Goblin's special).
+  playTurn(card) {
+    this.resolve(card);
+
+    if (this.#enemy.isAlive()) {
+      this.#enemy.takeTurn(this.#player, this.#rng);
+    }
+    if (!this.#player.isAlive()) {
+      return TurnOutcome.PLAYER_DEFEATED;
+    }
+    if (!this.#enemy.isAlive()) {
+      return TurnOutcome.ENEMY_DEFEATED;
+    }
+
+    this.endTurn();
+    return TurnOutcome.CONTINUE;
   }
 
   resolve(card) {

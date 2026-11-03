@@ -1,6 +1,19 @@
 import test from "node:test";
 import assert from "node:assert";
-import { GameLogic } from "../src/GameLogic.js";
+import { Card } from "DeckLib";
+import { GameLogic, TurnOutcome } from "../src/models/GameLogic.js";
+import { Player } from "../src/models/Player.js";
+import { Goblin } from "../src/models/Enemies/Goblin.js";
+import { Knight } from "../src/models/Enemies/Knight.js";
+
+const alwaysSpecialRng = { nextFloat: () => 0 };
+const neverSpecialRng = { nextFloat: () => 0.99 };
+const deckWithCards = {
+  isDeckEmpty: () => false,
+  draw: () => new Card("Spades", "2"),
+};
+const emptyDiscard = { getPileSize: () => 0 };
+const rollsSix = { roll: () => 6 };
 
 test("endTurn reshuffles discard pile into deck when deck is empty and discard has cards", () => {
   let reshuffledCalled = false;
@@ -88,4 +101,54 @@ test("endTurn does not reshuffle if deck still has cards remaining", () => {
 
   assert.strictEqual(reshuffledCalled, false, "reshuffle should not be called if deck has cards");
   assert.strictEqual(drawnCalled, true, "normal draw should still occur");
+});
+
+test("BR-2: a Goblin that defeats itself with its special ends the fight in the same turn", () => {
+  const player = new Player("Test Hero", 30);
+  const goblin = new Goblin();
+  goblin.takeDamage(8);
+  const noDrawDeck = {
+    isDeckEmpty: () => assert.fail("no card should be drawn after the fight ends"),
+  };
+  const gameLogic = new GameLogic(player, goblin, noDrawDeck, emptyDiscard, alwaysSpecialRng, rollsSix);
+
+  const outcome = gameLogic.playTurn(new Card("Hearts", "2"));
+
+  assert.strictEqual(outcome, TurnOutcome.ENEMY_DEFEATED);
+  assert.strictEqual(goblin.isAlive(), false);
+});
+
+test("playTurn does not let an enemy defeated by the player's card act", () => {
+  const player = new Player("Test Hero", 30);
+  const goblin = new Goblin();
+  const rngThatMustNotBeUsed = {
+    nextFloat: () => assert.fail("a defeated enemy should not take a turn"),
+  };
+  const gameLogic = new GameLogic(player, goblin, deckWithCards, emptyDiscard, rngThatMustNotBeUsed, rollsSix);
+
+  const outcome = gameLogic.playTurn(new Card("Spades", "4"));
+
+  assert.strictEqual(outcome, TurnOutcome.ENEMY_DEFEATED);
+  assert.strictEqual(player.getHp(), 30);
+});
+
+test("playTurn reports the player defeated when the enemy's attack is lethal", () => {
+  const player = new Player("Test Hero", 8);
+  const knight = new Knight();
+  const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, alwaysSpecialRng, rollsSix);
+
+  const outcome = gameLogic.playTurn(new Card("Spades", "2"));
+
+  assert.strictEqual(outcome, TurnOutcome.PLAYER_DEFEATED);
+});
+
+test("playTurn continues and draws a card when both survive", () => {
+  const player = new Player("Test Hero", 30);
+  const knight = new Knight();
+  const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, neverSpecialRng, rollsSix);
+
+  const outcome = gameLogic.playTurn(new Card("Diamonds", "2"));
+
+  assert.strictEqual(outcome, TurnOutcome.CONTINUE);
+  assert.strictEqual(player.getHand().getCards().length, 1);
 });

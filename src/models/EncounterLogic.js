@@ -1,6 +1,6 @@
 import { EnemyIndex } from "./Enemies/EnemyIndex.js";
-import { Observable } from "./Observable.js";
-import { GameEvent } from "./GameEvents.js";
+import { Observable } from "../events/Observable.js";
+import { GameEvent } from "../events/GameEvents.js";
 
 function announceEnemyDefeat(enemy, enemiesDefeated, events) {
   enemiesDefeated++;

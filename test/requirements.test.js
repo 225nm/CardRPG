@@ -1,11 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { Card } from "DeckLib";
-import { CombatUI } from "../src/CombatUI.js";
-import { EnemyIndex } from "../src/Enemies/EnemyIndex.js";
-import { completeEncounter } from "../src/EncounterLogic.js";
-import { GameLogic } from "../src/GameLogic.js";
-import { Player } from "../src/Player.js";
+import { CombatUI } from "../src/views/CombatUI.js";
+import { EnemyIndex } from "../src/models/Enemies/EnemyIndex.js";
+import { completeEncounter } from "../src/models/EncounterLogic.js";
+import { GameLogic } from "../src/models/GameLogic.js";
+import { Player } from "../src/models/Player.js";
 
 function captureConsoleOutput(run) {
   const originalLog = console.log;

@@ -1,5 +1,5 @@
 import { Enemy } from "../Enemy.js";
-import { GameEvent } from "../GameEvents.js";
+import { GameEvent } from "../../events/GameEvents.js";
 
 const SWORD_SLASH_DAMAGE = 8;
 

@@ -1,5 +1,5 @@
-import { Observable } from "./Observable.js";
-import { GameEvent } from "./GameEvents.js";
+import { Observable } from "../events/Observable.js";
+import { GameEvent } from "../events/GameEvents.js";
 
 // Base class for enemies. Hp = health points. Luck is used for chance to use special attack.
 export class Enemy extends Observable {
