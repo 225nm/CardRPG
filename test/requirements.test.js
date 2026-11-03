@@ -63,6 +63,8 @@ test("R1: defeating an enemy adds the selected reward to the discard pile", asyn
       assert.equal(amount, 3);
       return [reward];
     },
+  };
+  const rewardView = {
     chooseReward: async (rewards) => rewards[0],
   };
   const randomizer = {
@@ -77,6 +79,7 @@ test("R1: defeating an enemy adds the selected reward to the discard pile", asyn
       deck,
       discard,
       rewardLogic,
+      rewardView,
       randomizer,
       rng: {},
     }),

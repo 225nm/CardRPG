@@ -9,10 +9,18 @@ import { CommonCards, UncommonCards, RareCards } from "./src/Loot.js";
 import { RewardLogic } from "./src/RewardLogic.js";
 import { getSingleKey } from "./src/InputLogic.js";
 import { completeEncounter } from "./src/EncounterLogic.js";
+import { Observable } from "./src/Observable.js";
+import { GameLog } from "./src/GameLog.js";
+import { HandView } from "./src/HandView.js";
+import { RewardView } from "./src/RewardView.js";
 
-function createCombatHandlers(player, enemy, deck, discard, rng, d6) {
+function createCombatHandlers({ player, enemy, deck, discard, rng, d6, gameLog }) {
+  const gameLogic = new GameLogic(player, enemy, deck, discard, rng, d6);
+  gameLog.observe(enemy);
+  gameLog.observe(gameLogic);
+
   return {
-    gameLogic: new GameLogic(player, enemy, deck, discard, rng, d6),
+    gameLogic,
     combatUI: new CombatUI(player, enemy, deck, discard),
   };
 }
@@ -26,8 +34,16 @@ async function startGame() {
   // Initialize dice logic
   const d6 = new Dice();
 
+  // Initialize views
+  const gameLog = new GameLog();
+  const rewardView = new RewardView();
+  const encounterEvents = new Observable();
+  gameLog.observe(encounterEvents);
+
   // Initialize player and deck handlers
   const player = new Player("Player1", 30);
+  const handView = new HandView(player);
+  gameLog.observe(player);
   const deck = new Deck(starterDeck, shuffler);
   const discard = new DiscardPile();
   let enemiesDefeated = 0;
@@ -35,17 +51,18 @@ async function startGame() {
   // Initialize enemy
   let enemy = new EnemyIndex.Goblin();
 
-  let { gameLogic, combatUI } = createCombatHandlers(
+  let { gameLogic, combatUI } = createCombatHandlers({
     player,
     enemy,
     deck,
     discard,
     rng,
     d6,
-  );
+    gameLog,
+  });
   const rewardLogic = new RewardLogic(CommonCards, UncommonCards, RareCards);
 
-  console.log("=== Welcome to CardRPG, press q at any time to exit ===");
+  gameLog.showWelcome();
   deck.shuffle();
 
   // Initialize starting hand
@@ -57,7 +74,7 @@ async function startGame() {
     player.sortHand();
 
     combatUI.render();
-    player.renderHand();
+    handView.render();
 
     const handCards = player.getHand().getCards();
 
@@ -67,7 +84,7 @@ async function startGame() {
     const trimmedInput = rawInput.trim().toLowerCase();
 
     if (trimmedInput === "q") {
-      console.log("\nExiting game. Thanks for playing!");
+      gameLog.showGoodbye();
       playing = false;
       process.exit(0);
     }
@@ -75,12 +92,10 @@ async function startGame() {
     const choice = parseInt(trimmedInput, 10) - 1;
 
     if (isNaN(choice) || choice < 0 || choice >= handCards.length) {
-      console.log(
-        "\n❌ Invalid choice! Please enter a valid card number corresponding to your hand.",
-      );
+      gameLog.showInvalidCardChoice();
       continue;
     }
-    console.log("\n" + "=".repeat(40));
+    gameLog.showTurnDivider();
 
     const playedCard = player.playCardByIndex(choice, discard);
     gameLogic.resolve(playedCard);
@@ -93,19 +108,22 @@ async function startGame() {
         deck,
         discard,
         rewardLogic,
+        rewardView,
         randomizer,
         rng,
+        events: encounterEvents,
       });
       enemiesDefeated = encounter.enemiesDefeated;
       enemy = encounter.enemy;
-      ({ gameLogic, combatUI } = createCombatHandlers(
+      ({ gameLogic, combatUI } = createCombatHandlers({
         player,
         enemy,
         deck,
         discard,
         rng,
         d6,
-      ));
+        gameLog,
+      }));
 
       continue;
     }
@@ -113,8 +131,7 @@ async function startGame() {
     enemy.takeTurn(player, rng);
 
     if (!player.isAlive()) {
-      console.log(`\n 💀 ${player.getName()} has been defeated!`);
-      console.log(` You defeated ${enemiesDefeated} enemies`);
+      gameLog.showGameOver(player, enemiesDefeated);
       process.exit(0);
     }
 

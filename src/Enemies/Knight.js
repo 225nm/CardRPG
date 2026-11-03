@@ -1,4 +1,7 @@
 import { Enemy } from "../Enemy.js";
+import { GameEvent } from "../GameEvents.js";
+
+const SWORD_SLASH_DAMAGE = 8;
 
 export class Knight extends Enemy {
   constructor(
@@ -14,16 +17,15 @@ export class Knight extends Enemy {
   }
 
   attack(target) {
-    console.log(
-      `\n🤺 ${this.getName()} swings his blade at ${target.getName()}!`,
-    );
+    this.notify(GameEvent.ENEMY_ATTACKED, { enemy: this, target });
     target.takeDamage(this.getPower());
   }
 
   special(target) {
-    console.log(
-      `\n⚡ ${this.getName()} used ${this.getSpecialName()} and dealt 8 damage`,
-    );
-    target.takeDamage(8);
+    this.notify(GameEvent.ENEMY_USED_SPECIAL, {
+      enemy: this,
+      damage: SWORD_SLASH_DAMAGE,
+    });
+    target.takeDamage(SWORD_SLASH_DAMAGE);
   }
 }

@@ -1,4 +1,7 @@
-export class GameLogic {
+import { Observable } from "./Observable.js";
+import { GameEvent } from "./GameEvents.js";
+
+export class GameLogic extends Observable {
   #player;
   #enemy;
   #deck;
@@ -7,6 +10,7 @@ export class GameLogic {
   #d6;
 
   constructor(player, enemy, deck, discard, rng, d6) {
+    super();
     this.#player = player;
     this.#enemy = enemy;
     this.#deck = deck;
@@ -28,15 +32,17 @@ export class GameLogic {
     const rank = card.getRank();
     const rankWeight = card.getRankWeight();
 
-    console.log(`\n✨ Resolving ${card.toString()} (${suit})`);
+    this.notify(GameEvent.CARD_RESOLVING, { card });
 
     switch (suit) {
       case "Spades": {
         const roll = this.#d6.roll(this.#rng);
         const totalPower = rankWeight + roll;
-        console.log(
-          `⚔️ Physical Attack! Base ${rankWeight} + d6 Roll ${roll} = ${totalPower} damage!`,
-        );
+        this.notify(GameEvent.PHYSICAL_ATTACK_ROLLED, {
+          basePower: rankWeight,
+          roll,
+          totalPower,
+        });
         this.#enemy.takeDamage(totalPower);
         break;
       }
@@ -53,7 +59,7 @@ export class GameLogic {
 
       case "Clubs": {
         if (rankWeight === 2) {
-          console.log(`🔮 Special: Draw 2 cards!`);
+          this.notify(GameEvent.DRAW_SPECIAL_TRIGGERED, { amount: 2 });
           if (
             this.#deck.remainingDeckSize() < 2 &&
             this.#discard.getPileSize() > 0
@@ -70,16 +76,14 @@ export class GameLogic {
 
   endTurn() {
     if (this.#deck.isDeckEmpty() && this.#discard.getPileSize() > 0) {
-      console.log("♻️ Deck is empty! Reshuffling discard pile...");
+      this.notify(GameEvent.EMPTY_DECK_RESHUFFLED);
       this.#deck.reshuffleDiscardPile(this.#discard);
     }
 
     if (!this.#deck.isDeckEmpty()) {
       const replacementCard = this.#deck.draw();
       this.#player.addCardToHand(replacementCard);
-      console.log(
-        `\n 📥 Drew a new card for turn: ${replacementCard.toString()}`,
-      );
+      this.notify(GameEvent.TURN_CARD_DRAWN, { card: replacementCard });
     }
   }
 }

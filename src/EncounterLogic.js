@@ -1,19 +1,18 @@
 import { EnemyIndex } from "./Enemies/EnemyIndex.js";
+import { Observable } from "./Observable.js";
+import { GameEvent } from "./GameEvents.js";
 
-function announceEnemyDefeat(enemy, enemiesDefeated) {
+function announceEnemyDefeat(enemy, enemiesDefeated, events) {
   enemiesDefeated++;
-  console.log(`\n${enemy.getName()} has been defeated!`);
-  console.log(`You have defeated ${enemiesDefeated} enemies`);
+  events.notify(GameEvent.ENEMY_DEFEATED, { enemy, enemiesDefeated });
   return enemiesDefeated;
 }
 
-async function addRewardToDiscard(rewardLogic, discard) {
+async function addRewardToDiscard(rewardLogic, rewardView, discard, events) {
   const rewards = rewardLogic.generateRewards(3);
-  const selectedReward = await rewardLogic.chooseReward(rewards);
-  console.log("REWARDS:" + rewards);
-  console.log(selectedReward);
+  const selectedReward = await rewardView.chooseReward(rewards);
   discard.addCard(selectedReward);
-  console.log(`\n✨ Added ${selectedReward.toString()} to your deck!`);
+  events.notify(GameEvent.REWARD_ADDED, { card: selectedReward });
 }
 
 function discardRemainingHand(player, discard) {
@@ -48,11 +47,13 @@ export async function completeEncounter({
   deck,
   discard,
   rewardLogic,
+  rewardView,
   randomizer,
   rng,
+  events = new Observable(),
 }) {
-  enemiesDefeated = announceEnemyDefeat(enemy, enemiesDefeated);
-  await addRewardToDiscard(rewardLogic, discard);
+  enemiesDefeated = announceEnemyDefeat(enemy, enemiesDefeated, events);
+  await addRewardToDiscard(rewardLogic, rewardView, discard, events);
   discardRemainingHand(player, discard);
   drawNextHand(player, deck, discard);
 

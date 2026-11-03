@@ -1,4 +1,7 @@
 import { Enemy } from "../Enemy.js";
+import { GameEvent } from "../GameEvents.js";
+
+const STUMBLE_SELF_DAMAGE = 2;
 
 export class Goblin extends Enemy {
   constructor(
@@ -14,12 +17,15 @@ export class Goblin extends Enemy {
   }
 
   attack(target) {
-    console.log(`\n👹 ${this.getName()} swings a rusty blade at ${target.getName()}!`);
+    this.notify(GameEvent.ENEMY_ATTACKED, { enemy: this, target });
     target.takeDamage(this.getPower());
   }
 
   special() {
-    console.log(`\n⚡ ${this.getName()} ${this.getSpecialName()} and takes 2 damage`);
-    this.takeDamage(2);
+    this.notify(GameEvent.ENEMY_USED_SPECIAL, {
+      enemy: this,
+      damage: STUMBLE_SELF_DAMAGE,
+    });
+    this.takeDamage(STUMBLE_SELF_DAMAGE);
   }
 }

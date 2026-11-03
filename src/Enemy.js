@@ -1,5 +1,8 @@
+import { Observable } from "./Observable.js";
+import { GameEvent } from "./GameEvents.js";
+
 // Base class for enemies. Hp = health points. Luck is used for chance to use special attack.
-export class Enemy {
+export class Enemy extends Observable {
   #name;
   #maxHp;
   #hp;
@@ -10,6 +13,7 @@ export class Enemy {
   #luck;
 
   constructor(name, maxHp, power, specialName, target, specialTarget, luck) {
+    super();
     this.#name = name;
     this.#maxHp = maxHp;
     this.#hp = maxHp;
@@ -58,9 +62,7 @@ export class Enemy {
 
   takeDamage(amount) {
     this.#hp = Math.max(0, this.#hp - amount);
-    console.log(
-      `🗡️ ${this.#name} takes ${amount} damage! (HP: ${this.#hp}/${this.#maxHp})`,
-    );
+    this.notify(GameEvent.ENEMY_DAMAGED, { enemy: this, amount });
   }
 
   takeTurn(player, rng) {

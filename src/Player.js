@@ -1,7 +1,9 @@
 import { Hand } from "DeckLib";
+import { Observable } from "./Observable.js";
+import { GameEvent } from "./GameEvents.js";
 
 // Player class, hp is an abbreviation for health points.
-export class Player {
+export class Player extends Observable {
   #name;
   #maxHp;
   #hp;
@@ -9,6 +11,7 @@ export class Player {
   #hand;
 
   constructor(name = "Player1", maxHp = 30, armour = 0) {
+    super();
     this.#name = name;
     this.#maxHp = maxHp;
     this.#hp = maxHp;
@@ -47,30 +50,25 @@ export class Player {
       const absorbed = Math.min(this.#armour, unblockedDamage);
       this.#armour -= absorbed;
       unblockedDamage -= absorbed;
-      console.log(
-        `🛡️  Armour absorbed ${absorbed} damage! (Armour left: ${this.#armour})`,
-      );
+      this.notify(GameEvent.ARMOUR_ABSORBED, { player: this, absorbed });
     }
     if (unblockedDamage > 0) {
       this.#hp = Math.max(0, this.#hp - unblockedDamage);
-      console.log(
-        `💥 ${this.#name} takes ${unblockedDamage} damage! (HP: ${this.#hp}/${this.#maxHp})`,
-      );
+      this.notify(GameEvent.PLAYER_DAMAGED, {
+        player: this,
+        amount: unblockedDamage,
+      });
     }
   }
 
   heal(amount) {
     this.#hp = Math.min(this.#maxHp, this.#hp + amount);
-    console.log(
-      `💚 ${this.#name} heals for ${amount} HP! (HP: ${this.#hp}/${this.#maxHp})`,
-    );
+    this.notify(GameEvent.PLAYER_HEALED, { player: this, amount });
   }
 
   addArmour(amount) {
     this.#armour += amount;
-    console.log(
-      `🛡️  ${this.#name} gains ${amount} armour! (Total Armour: ${this.#armour})`,
-    );
+    this.notify(GameEvent.ARMOUR_GAINED, { player: this, amount });
   }
 
   addCardToHand(cards) {
@@ -85,57 +83,16 @@ export class Player {
     const cards = this.#hand.getCards();
     // TODO fix redundant validation
     if (index < 0 || index >= cards.length) {
-      console.log("❌ Invalid card index!");
+      this.notify(GameEvent.INVALID_CARD_INDEX);
       return null;
     }
     const cardToPlay = cards[index];
     this.#hand.playCard(cardToPlay, discardPile);
-    console.log(`⚔️  Played ${cardToPlay.toString()} from hand.`);
+    this.notify(GameEvent.CARD_PLAYED, { card: cardToPlay });
     return cardToPlay;
   }
 
   sortHand() {
     this.#hand.sortByValue();
-  }
-
-  renderHand() {
-    console.log(`\n--- ${this.#name}'s Hand ---`);
-    const cards = this.#hand.getCards();
-    if (cards.length === 0) {
-      console.log("  (Hand is empty)");
-      return;
-    }
-
-    cards.forEach((card, index) => {
-      const suit = card.getSuit();
-      const rankWeight = card.getRankWeight();
-      let description = "";
-
-      // Assign descriptions based on card suit and effect rules
-      switch (suit) {
-        case "Spades":
-          description = `[Physical Attack: Base ${rankWeight} + d6 roll]`;
-          break;
-        case "Hearts":
-          description = `[Healing: Restores ${rankWeight} HP]`;
-          break;
-        case "Diamonds":
-          description = `[Defense: Grants ${rankWeight} Armour]`;
-          break;
-        case "Clubs":
-          if (rankWeight === 2) {
-            description = `[Special: Draw 2 cards]`;
-          } else {
-            description = `[Special Utility]`;
-          }
-          break;
-        default:
-          description = `[Unknown Effect]`;
-      }
-
-      console.log(
-        `  [${index + 1}] ${card.toString().padEnd(18)} -> ${description}`,
-      );
-    });
   }
 }
