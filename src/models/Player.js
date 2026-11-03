@@ -2,6 +2,11 @@ import { Hand } from "DeckLib";
 import { Observable } from "../events/Observable.js";
 import { GameEvent } from "../events/GameEvents.js";
 import { HandFullError } from "./HandFullError.js";
+import {
+  assertNonEmptyString,
+  assertPositiveInteger,
+  assertNonNegativeInteger,
+} from "./validators.js";
 
 const MAX_HAND_SIZE = 9;
 
@@ -15,11 +20,18 @@ export class Player extends Observable {
 
   constructor(name = "Player1", maxHp = 30, armour = 0) {
     super();
+    this.#validateStats(name, maxHp, armour);
     this.#name = name;
     this.#maxHp = maxHp;
     this.#hp = maxHp;
     this.#armour = armour;
     this.#hand = new Hand();
+  }
+
+  #validateStats(name, maxHp, armour) {
+    assertNonEmptyString(name, "name");
+    assertPositiveInteger(maxHp, "maxHp");
+    assertNonNegativeInteger(armour, "armour");
   }
 
   getName() {
@@ -96,16 +108,22 @@ export class Player extends Observable {
   }
 
   playCardByIndex(index, discardPile) {
-    const cards = this.#hand.getCards();
-    // TODO fix redundant validation
-    if (index < 0 || index >= cards.length) {
-      this.notify(GameEvent.INVALID_CARD_INDEX);
-      return null;
-    }
-    const cardToPlay = cards[index];
+    this.#assertCardIndexInHand(index);
+    const cardToPlay = this.#hand.getCards()[index];
     this.#hand.playCard(cardToPlay, discardPile);
     this.notify(GameEvent.CARD_PLAYED, { card: cardToPlay });
     return cardToPlay;
+  }
+
+  // HandView validates the player's input; reaching this throw means a
+  // caller passed an index without validating it first.
+  #assertCardIndexInHand(index) {
+    const handSize = this.#hand.getHandSize();
+    if (!Number.isInteger(index) || index < 0 || index >= handSize) {
+      throw new RangeError(
+        `Card index must be between 0 and ${handSize - 1}, got ${index}`,
+      );
+    }
   }
 
   sortHand() {

@@ -6,7 +6,6 @@ export const GameEvent = Object.freeze({
   PLAYER_HEALED: "playerHealed",
   ARMOUR_GAINED: "armourGained",
   CARD_PLAYED: "cardPlayed",
-  INVALID_CARD_INDEX: "invalidCardIndex",
   ENEMY_DAMAGED: "enemyDamaged",
   ENEMY_ATTACKED: "enemyAttacked",
   ENEMY_USED_SPECIAL: "enemyUsedSpecial",

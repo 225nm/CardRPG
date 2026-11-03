@@ -25,7 +25,9 @@ export class HandView {
   // Asks until the player picks a card in their hand, and returns its index.
   async readCardChoice() {
     while (true) {
-      const key = await getSingleKey("\n Enter the number of the card to play: ");
+      const key = await getSingleKey(
+        "\n Enter the number of the card to play: ",
+      );
       // Base 10, -1 to properly represent index
       const cardIndex = parseInt(key.trim(), 10) - 1;
 
@@ -40,7 +42,9 @@ export class HandView {
 
   #isCardInHand(cardIndex) {
     const handSize = this.#getCards().length;
-    return Number.isInteger(cardIndex) && cardIndex >= 0 && cardIndex < handSize;
+    return (
+      Number.isInteger(cardIndex) && cardIndex >= 0 && cardIndex < handSize
+    );
   }
 
   #getCards() {
@@ -58,7 +62,9 @@ export class HandView {
       case "Diamonds":
         return `[Defense: Grants ${rankWeight} Armour]`;
       case "Clubs":
-        return rankWeight === 2 ? `[Special: Draw 2 cards]` : `[Special Utility]`;
+        return rankWeight === 2
+          ? `[Special: Draw 2 cards]`
+          : `[Special Utility]`;
       default:
         return `[Unknown Effect]`;
     }

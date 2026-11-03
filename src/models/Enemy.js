@@ -1,5 +1,11 @@
 import { Observable } from "../events/Observable.js";
 import { GameEvent } from "../events/GameEvents.js";
+import {
+  assertNonEmptyString,
+  assertPositiveInteger,
+  assertNonNegativeInteger,
+  assertProbability,
+} from "./validators.js";
 
 // Base class for enemies. Hp = health points. Luck is used for chance to use special attack.
 export class Enemy extends Observable {
@@ -14,6 +20,7 @@ export class Enemy extends Observable {
 
   constructor(name, maxHp, power, specialName, target, specialTarget, luck) {
     super();
+    this.#validateStats(name, maxHp, power, specialName, luck);
     this.#name = name;
     this.#maxHp = maxHp;
     this.#hp = maxHp;
@@ -22,6 +29,14 @@ export class Enemy extends Observable {
     this.#target = target;
     this.#specialTarget = specialTarget;
     this.#luck = luck;
+  }
+
+  #validateStats(name, maxHp, power, specialName, luck) {
+    assertNonEmptyString(name, "name");
+    assertPositiveInteger(maxHp, "maxHp");
+    assertNonNegativeInteger(power, "power");
+    assertNonEmptyString(specialName, "specialName");
+    assertProbability(luck, "luck");
   }
 
   getName() {

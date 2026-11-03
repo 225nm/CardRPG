@@ -53,7 +53,6 @@ const EVENT_MESSAGES = {
     `🛡️  ${player.getName()} gains ${amount} armour! (Total Armour: ${player.getArmour()})`,
   [GameEvent.CARD_PLAYED]: ({ card }) =>
     `⚔️  Played ${card.toString()} from hand.`,
-  [GameEvent.INVALID_CARD_INDEX]: () => "❌ Invalid card index!",
   [GameEvent.ENEMY_DAMAGED]: ({ enemy, amount }) =>
     `🗡️ ${enemy.getName()} takes ${amount} damage! (HP: ${enemy.getHp()}/${enemy.getMaxHp()})`,
   [GameEvent.ENEMY_ATTACKED]: ({ enemy, target }) =>
