@@ -15,6 +15,7 @@ export const GameEvent = Object.freeze({
   DRAW_SPECIAL_TRIGGERED: "drawSpecialTriggered",
   EMPTY_DECK_RESHUFFLED: "emptyDeckReshuffled",
   TURN_CARD_DRAWN: "turnCardDrawn",
+  HAND_FULL: "handFull",
   ENEMY_DEFEATED: "enemyDefeated",
   REWARD_ADDED: "rewardAdded",
 });

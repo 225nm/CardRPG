@@ -70,6 +70,8 @@ const EVENT_MESSAGES = {
     "♻️ Deck is empty! Reshuffling discard pile...",
   [GameEvent.TURN_CARD_DRAWN]: ({ card }) =>
     `\n 📥 Drew a new card for turn: ${card.toString()}`,
+  [GameEvent.HAND_FULL]: ({ maxHandSize }) =>
+    `\n✋ Your hand is full (max ${maxHandSize} cards). The card stays in the deck.`,
   [GameEvent.ENEMY_DEFEATED]: ({ enemy, enemiesDefeated }) =>
     `\n${enemy.getName()} has been defeated!\nYou have defeated ${enemiesDefeated} enemies`,
   [GameEvent.REWARD_ADDED]: ({ card }) =>

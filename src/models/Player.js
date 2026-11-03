@@ -1,6 +1,9 @@
 import { Hand } from "DeckLib";
 import { Observable } from "../events/Observable.js";
 import { GameEvent } from "../events/GameEvents.js";
+import { HandFullError } from "./HandFullError.js";
+
+const MAX_HAND_SIZE = 9;
 
 // Player class, hp is an abbreviation for health points.
 export class Player extends Observable {
@@ -72,10 +75,23 @@ export class Player extends Observable {
   }
 
   addCardToHand(cards) {
-    if (Array.isArray(cards)) {
-      cards.forEach((card) => this.#hand.addCard(card));
-    } else {
-      this.#hand.addCard(cards);
+    const newCards = Array.isArray(cards) ? cards : [cards];
+    this.#ensureRoomInHand(newCards.length);
+    newCards.forEach((card) => this.#hand.addCard(card));
+  }
+
+  // Checks the hand size before drawing, so a card that would not fit
+  // is never taken from the deck.
+  drawCardFrom(deck) {
+    this.#ensureRoomInHand(1);
+    const card = deck.draw();
+    this.#hand.addCard(card);
+    return card;
+  }
+
+  #ensureRoomInHand(cardCount) {
+    if (this.#hand.getHandSize() + cardCount > MAX_HAND_SIZE) {
+      throw new HandFullError(MAX_HAND_SIZE);
     }
   }
 

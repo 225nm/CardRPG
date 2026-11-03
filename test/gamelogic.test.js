@@ -18,7 +18,6 @@ const rollsSix = { roll: () => 6 };
 test("endTurn reshuffles discard pile into deck when deck is empty and discard has cards", () => {
   let reshuffledCalled = false;
   let drawnCalled = false;
-  let cardAddedToHand = false;
   let deckEmpty = true; // ✅ Track deck state for the mock
 
   const mockDeck = {
@@ -38,19 +37,14 @@ test("endTurn reshuffles discard pile into deck when deck is empty and discard h
     getPileSize: () => 5,
   };
 
-  const mockPlayer = {
-    addCardToHand: (card) => {
-      cardAddedToHand = true;
-      assert.strictEqual(card.toString(), "Ace of Spades");
-    },
-  };
+  const player = new Player();
 
   const mockEnemy = {};
   const mockRng = {};
   const mockD6 = {};
 
   const gameLogic = new GameLogic(
-    mockPlayer,
+    player,
     mockEnemy,
     mockDeck,
     mockDiscard,
@@ -62,7 +56,9 @@ test("endTurn reshuffles discard pile into deck when deck is empty and discard h
 
   assert.strictEqual(reshuffledCalled, true, "reshuffleDiscardPile should be called when deck is empty");
   assert.strictEqual(drawnCalled, true, "deck.draw should be called after reshuffle");
-  assert.strictEqual(cardAddedToHand, true, "player should receive the replacement card");
+  const handCards = player.getHand().getCards();
+  assert.strictEqual(handCards.length, 1, "player should receive the replacement card");
+  assert.strictEqual(handCards[0].toString(), "Ace of Spades");
 });
 
 test("endTurn does not reshuffle if deck still has cards remaining", () => {
@@ -84,12 +80,8 @@ test("endTurn does not reshuffle if deck still has cards remaining", () => {
     getPileSize: () => 3,
   };
 
-  const mockPlayer = {
-    addCardToHand: () => {},
-  };
-
   const gameLogic = new GameLogic(
-    mockPlayer,
+    new Player(),
     {},
     mockDeck,
     mockDiscard,

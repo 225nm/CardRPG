@@ -116,10 +116,8 @@ test("R4: cards apply different effects based on their suits", () => {
   let cardsDrawn = 0;
   const deck = {
     remainingDeckSize: () => 5,
-    drawMultiple: (amount) => {
-      cardsDrawn = amount;
-      return drawnCards;
-    },
+    isDeckEmpty: () => cardsDrawn >= drawnCards.length,
+    draw: () => drawnCards[cardsDrawn++],
   };
   const d6 = { roll: () => 1 };
   const gameLogic = new GameLogic(player, enemy, deck, discard, {}, d6);

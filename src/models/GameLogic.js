@@ -1,5 +1,6 @@
 import { Observable } from "../events/Observable.js";
 import { GameEvent } from "../events/GameEvents.js";
+import { HandFullError } from "./HandFullError.js";
 
 export const TurnOutcome = Object.freeze({
   CONTINUE: "continue",
@@ -91,8 +92,7 @@ export class GameLogic extends Observable {
           ) {
             this.#deck.reshuffleDiscardPile(this.#discard);
           }
-          const drawnCards = this.#deck.drawMultiple(2);
-          this.#player.addCardToHand(drawnCards);
+          this.#drawSpecialCards(2);
         }
         break;
       }
@@ -106,9 +106,31 @@ export class GameLogic extends Observable {
     }
 
     if (!this.#deck.isDeckEmpty()) {
-      const replacementCard = this.#deck.draw();
-      this.#player.addCardToHand(replacementCard);
-      this.notify(GameEvent.TURN_CARD_DRAWN, { card: replacementCard });
+      try {
+        const replacementCard = this.#player.drawCardFrom(this.#deck);
+        this.notify(GameEvent.TURN_CARD_DRAWN, { card: replacementCard });
+      } catch (error) {
+        this.#reportHandFull(error);
+      }
     }
+  }
+
+  // Draws one card at a time, so a full hand stops the draw at the card
+  // that would not fit.
+  #drawSpecialCards(count) {
+    try {
+      for (let i = 0; i < count && !this.#deck.isDeckEmpty(); i++) {
+        this.#player.drawCardFrom(this.#deck);
+      }
+    } catch (error) {
+      this.#reportHandFull(error);
+    }
+  }
+
+  #reportHandFull(error) {
+    if (!(error instanceof HandFullError)) {
+      throw error;
+    }
+    this.notify(GameEvent.HAND_FULL, { maxHandSize: error.getMaxHandSize() });
   }
 }
