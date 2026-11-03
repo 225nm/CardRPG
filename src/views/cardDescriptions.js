@@ -1,5 +1,8 @@
 import { CardEffect } from "../models/GameCard.js";
 
+// Wider than the longest card name ("10 of Diamonds") so the effect texts line up.
+const CARD_NAME_WIDTH = 18;
+
 // Player-facing text for card effects, shared by every view that lists cards.
 export function describeCardEffect(card) {
   const power = card.getPower();
@@ -19,5 +22,5 @@ export function describeCardEffect(card) {
 }
 
 export function describeCardWithEffect(card, number) {
-  return `  [${number}] ${card.toString().padEnd(18)} -> ${describeCardEffect(card)}`;
+  return `  [${number}] ${card.toString().padEnd(CARD_NAME_WIDTH)} -> ${describeCardEffect(card)}`;
 }
