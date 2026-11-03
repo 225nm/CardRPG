@@ -65,7 +65,7 @@ test("drawing with a full hand throws before a card leaves the deck", () => {
 test("endTurn with a full hand skips the draw and reports the full hand", () => {
   const player = createPlayerWithCards(MAX_HAND_SIZE);
   const deck = createCountingDeck(5);
-  const gameLogic = new GameLogic(player, new Goblin(), deck, { getPileSize: () => 0 }, {}, {});
+  const gameLogic = new GameLogic(player, new Goblin(), deck, { getPileSize: () => 0 }, {});
   const events = recordEvents(gameLogic);
 
   gameLogic.endTurn();
@@ -82,7 +82,7 @@ test("endTurn with a full hand skips the draw and reports the full hand", () => 
 test("the Clubs draw stops at the card that would be the 10th", () => {
   const player = createPlayerWithCards(8);
   const deck = createCountingDeck(5);
-  const gameLogic = new GameLogic(player, new Goblin(), deck, { getPileSize: () => 0 }, {}, {});
+  const gameLogic = new GameLogic(player, new Goblin(), deck, { getPileSize: () => 0 }, {});
   const events = recordEvents(gameLogic);
 
   gameLogic.resolve(GameCard.drawTwo());
@@ -94,7 +94,7 @@ test("the Clubs draw stops at the card that would be the 10th", () => {
 
 test("the game log prints a message when the hand is full", () => {
   const player = createPlayerWithCards(MAX_HAND_SIZE);
-  const gameLogic = new GameLogic(player, new Goblin(), createCountingDeck(5), { getPileSize: () => 0 }, {}, {});
+  const gameLogic = new GameLogic(player, new Goblin(), createCountingDeck(5), { getPileSize: () => 0 }, {});
   new GameLog().observe(gameLogic);
 
   const originalLog = console.log;

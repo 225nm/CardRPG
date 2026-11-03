@@ -6,14 +6,13 @@ import { Player } from "../src/models/Player.js";
 import { Goblin } from "../src/models/Enemies/Goblin.js";
 import { Knight } from "../src/models/Enemies/Knight.js";
 
-const alwaysSpecialRng = { nextFloat: () => 0 };
-const neverSpecialRng = { nextFloat: () => 0.99 };
+const alwaysSpecialRollsSix = { succeeds: () => true, rollD6: () => 6 };
+const neverSpecialRollsSix = { succeeds: () => false, rollD6: () => 6 };
 const deckWithCards = {
   isDeckEmpty: () => false,
   draw: () => GameCard.attack("2"),
 };
 const emptyDiscard = { getPileSize: () => 0 };
-const rollsSix = { roll: () => 6 };
 
 test("endTurn reshuffles discard pile into deck when deck is empty and discard has cards", () => {
   let reshuffledCalled = false;
@@ -40,16 +39,14 @@ test("endTurn reshuffles discard pile into deck when deck is empty and discard h
   const player = new Player();
 
   const mockEnemy = {};
-  const mockRng = {};
-  const mockD6 = {};
+  const mockRandom = {};
 
   const gameLogic = new GameLogic(
     player,
     mockEnemy,
     mockDeck,
     mockDiscard,
-    mockRng,
-    mockD6,
+    mockRandom,
   );
 
   gameLogic.endTurn();
@@ -86,7 +83,6 @@ test("endTurn does not reshuffle if deck still has cards remaining", () => {
     mockDeck,
     mockDiscard,
     {},
-    {},
   );
 
   gameLogic.endTurn();
@@ -102,7 +98,7 @@ test("BR-2: a Goblin that defeats itself with its special ends the fight in the 
   const noDrawDeck = {
     isDeckEmpty: () => assert.fail("no card should be drawn after the fight ends"),
   };
-  const gameLogic = new GameLogic(player, goblin, noDrawDeck, emptyDiscard, alwaysSpecialRng, rollsSix);
+  const gameLogic = new GameLogic(player, goblin, noDrawDeck, emptyDiscard, alwaysSpecialRollsSix);
 
   const outcome = gameLogic.playTurn(GameCard.heal("2"));
 
@@ -113,10 +109,11 @@ test("BR-2: a Goblin that defeats itself with its special ends the fight in the 
 test("playTurn does not let an enemy defeated by the player's card act", () => {
   const player = new Player("Test Hero", 30);
   const goblin = new Goblin();
-  const rngThatMustNotBeUsed = {
-    nextFloat: () => assert.fail("a defeated enemy should not take a turn"),
+  const randomForPlayerOnly = {
+    rollD6: () => 6,
+    succeeds: () => assert.fail("a defeated enemy should not take a turn"),
   };
-  const gameLogic = new GameLogic(player, goblin, deckWithCards, emptyDiscard, rngThatMustNotBeUsed, rollsSix);
+  const gameLogic = new GameLogic(player, goblin, deckWithCards, emptyDiscard, randomForPlayerOnly);
 
   const outcome = gameLogic.playTurn(GameCard.attack("4"));
 
@@ -127,7 +124,7 @@ test("playTurn does not let an enemy defeated by the player's card act", () => {
 test("playTurn reports the player defeated when the enemy's attack is lethal", () => {
   const player = new Player("Test Hero", 8);
   const knight = new Knight();
-  const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, alwaysSpecialRng, rollsSix);
+  const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, alwaysSpecialRollsSix);
 
   const outcome = gameLogic.playTurn(GameCard.attack("2"));
 
@@ -137,7 +134,7 @@ test("playTurn reports the player defeated when the enemy's attack is lethal", (
 test("playTurn continues and draws a card when both survive", () => {
   const player = new Player("Test Hero", 30);
   const knight = new Knight();
-  const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, neverSpecialRng, rollsSix);
+  const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, neverSpecialRollsSix);
 
   const outcome = gameLogic.playTurn(GameCard.armour("2"));
 

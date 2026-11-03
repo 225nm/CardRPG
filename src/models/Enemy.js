@@ -80,9 +80,8 @@ export class Enemy extends Observable {
     this.notify(GameEvent.ENEMY_DAMAGED, { enemy: this, amount });
   }
 
-  takeTurn(player, rng) {
-    const luckRoll = rng.nextFloat();
-    if (luckRoll < this.#luck) {
+  takeTurn(player, random) {
+    if (random.succeeds(this.#luck)) {
       this.special(player);
     } else {
       this.attack(player);

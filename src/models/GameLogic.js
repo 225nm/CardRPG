@@ -14,17 +14,15 @@ export class GameLogic extends Observable {
   #enemy;
   #deck;
   #discard;
-  #rng;
-  #d6;
+  #random;
 
-  constructor(player, enemy, deck, discard, rng, d6) {
+  constructor(player, enemy, deck, discard, random) {
     super();
     this.#player = player;
     this.#enemy = enemy;
     this.#deck = deck;
     this.#discard = discard;
-    this.#rng = rng;
-    this.#d6 = d6;
+    this.#random = random;
   }
 
   getPlayer() {
@@ -41,7 +39,7 @@ export class GameLogic extends Observable {
     this.resolve(card);
 
     if (this.#enemy.isAlive()) {
-      this.#enemy.takeTurn(this.#player, this.#rng);
+      this.#enemy.takeTurn(this.#player, this.#random);
     }
     if (!this.#player.isAlive()) {
       return TurnOutcome.PLAYER_DEFEATED;
@@ -93,7 +91,7 @@ export class GameLogic extends Observable {
   }
 
   #attackEnemy(basePower) {
-    const roll = this.#d6.roll(this.#rng);
+    const roll = this.#random.rollD6();
     const totalPower = basePower + roll;
     this.notify(GameEvent.PHYSICAL_ATTACK_ROLLED, {
       basePower,

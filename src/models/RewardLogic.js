@@ -1,46 +1,34 @@
-import { Randomizer, RandomGenerator } from "dice-rng-toolkit";
+// Chance of each rarity per reward, e.g. 0.6 = 60%.
+const COMMON_WEIGHT = 0.6;
+const UNCOMMON_WEIGHT = 0.3;
+const RARE_WEIGHT = 0.1;
 
 export class RewardLogic {
-  #CommonCards;
-  #UncommonCards;
-  #RareCards;
+  #commonCards;
+  #uncommonCards;
+  #rareCards;
+  #random;
 
-  constructor(CommonCards = [], UncommonCards = [], RareCards = []) {
-    this.#CommonCards = CommonCards;
-    this.#UncommonCards = UncommonCards;
-    this.#RareCards = RareCards;
+  constructor(commonCards, uncommonCards, rareCards, random) {
+    this.#commonCards = commonCards;
+    this.#uncommonCards = uncommonCards;
+    this.#rareCards = rareCards;
+    this.#random = random;
   }
 
   generateRewards(amount = 3) {
-    const randomizer = new Randomizer();
-    const rng = new RandomGenerator();
-    const rewardPool = [
-      this.#CommonCards,
-      this.#UncommonCards,
-      this.#RareCards,
-    ];
-    const rewards = [];
+    return Array.from({ length: amount }, () => this.#pickReward());
+  }
 
-    // Odds of a card of that specific rarity appearing. e.g. 0.6 = 60%
-    const cWeight = 0.6;
-    const uWeight = 0.3;
-    const rWeight = 0.1;
+  #pickReward() {
+    const pool = this.#pickRarityPool();
+    return this.#random.pick(pool);
+  }
 
-    // Selects cards randomly from the correct pool based on the random roll from rng.nextFloat (0-1)
-    for (let i = 0; i < amount; i++) {
-      let roll = rng.nextFloat();
-      let Pool = this.#CommonCards;
-      if (roll < cWeight) {
-        Pool = this.#CommonCards;
-      } else if (roll < cWeight + uWeight) {
-        Pool = this.#UncommonCards;
-      } else if (roll < cWeight + uWeight + rWeight) {
-        Pool = this.#RareCards;
-      }
-
-      const card = randomizer.pick(Pool, rng);
-      rewards.push(card);
-    }
-    return rewards;
+  #pickRarityPool() {
+    return this.#random.pickWeighted(
+      [this.#commonCards, this.#uncommonCards, this.#rareCards],
+      [COMMON_WEIGHT, UNCOMMON_WEIGHT, RARE_WEIGHT],
+    );
   }
 }

@@ -41,7 +41,7 @@ test("game cards can be sorted and played from a DeckLib hand", () => {
 });
 
 test("resolving a card with an unknown effect throws instead of doing nothing", () => {
-  const gameLogic = new GameLogic(new Player(), new Goblin(), {}, {}, {}, {});
+  const gameLogic = new GameLogic(new Player(), new Goblin(), {}, {}, {});
   const unknownCard = { getEffect: () => "teleport", getPower: () => 1 };
 
   assert.throws(() => gameLogic.resolve(unknownCard), TypeError);

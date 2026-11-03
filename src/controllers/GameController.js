@@ -1,5 +1,5 @@
 import { Deck, DiscardPile, Shuffler } from "DeckLib";
-import { RandomGenerator, Dice, Randomizer } from "dice-rng-toolkit";
+import { GameRandom } from "../models/GameRandom.js";
 import { Player } from "../models/Player.js";
 import { EnemyIndex } from "../models/Enemies/EnemyIndex.js";
 import { CombatUI } from "../views/CombatUI.js";
@@ -20,13 +20,16 @@ const REWARD_CHOICES = 3;
 
 export class GameController {
   #gameLog;
-  #rng = new RandomGenerator();
-  #randomizer = new Randomizer();
-  #d6 = new Dice();
+  #random = new GameRandom();
   #player = new Player("Player1", 30);
   #deck = new Deck(starterDeck, new Shuffler());
   #discard = new DiscardPile();
-  #rewardLogic = new RewardLogic(CommonCards, UncommonCards, RareCards);
+  #rewardLogic = new RewardLogic(
+    CommonCards,
+    UncommonCards,
+    RareCards,
+    this.#random,
+  );
   #handView = new HandView(this.#player);
   #rewardView = new RewardView();
   #encounterEvents = new Observable();
@@ -92,8 +95,7 @@ export class GameController {
       player: this.#player,
       deck: this.#deck,
       discard: this.#discard,
-      randomizer: this.#randomizer,
-      rng: this.#rng,
+      random: this.#random,
       events: this.#encounterEvents,
     });
     this.#startFight(nextEnemy);
@@ -106,8 +108,7 @@ export class GameController {
       enemy,
       this.#deck,
       this.#discard,
-      this.#rng,
-      this.#d6,
+      this.#random,
     );
     this.#combatUI = new CombatUI(this.#player, enemy, this.#deck, this.#discard);
     this.#gameLog.observe(enemy);

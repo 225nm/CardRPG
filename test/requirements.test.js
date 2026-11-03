@@ -50,7 +50,7 @@ test("R1: defeating an enemy adds the selected reward to the discard pile", () =
     shuffle: () => assert.fail("Expected the discard pile to be reshuffled"),
     drawMultiple: (amount) => Array.from({ length: amount }, () => "new card"),
   };
-  const randomizer = {
+  const random = {
     pick: (enemies) => enemies[0],
   };
 
@@ -59,8 +59,7 @@ test("R1: defeating an enemy adds the selected reward to the discard pile", () =
     player,
     deck,
     discard,
-    randomizer,
-    rng: {},
+    random,
   });
 
   assert.ok(discardedCards.includes(reward));
@@ -119,8 +118,8 @@ test("R4: cards apply different effects based on their suits", () => {
     isDeckEmpty: () => cardsDrawn >= drawnCards.length,
     draw: () => drawnCards[cardsDrawn++],
   };
-  const d6 = { roll: () => 1 };
-  const gameLogic = new GameLogic(player, enemy, deck, discard, {}, d6);
+  const rollsOne = { rollD6: () => 1 };
+  const gameLogic = new GameLogic(player, enemy, deck, discard, rollsOne);
 
   captureConsoleOutput(() => gameLogic.resolve(GameCard.heal("3")));
   assert.equal(player.getHp(), 18);

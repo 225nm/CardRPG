@@ -15,28 +15,28 @@ test("Goblin special method reduces HP by 2", () => {
   assert.strictEqual(goblin.getHp(), 8);
 });
 
-test("Goblin takeTurn triggers special when luck roll is below threshold", () => {
+test("Goblin takeTurn triggers special when the luck check succeeds", () => {
   const goblin = new Goblin("Goblin", 10, 3, "stumbles", "Player", "Goblin", 0.1);
-
-  // Mock RNG that returns 0.05 (which is < 0.1 luck threshold, triggering special)
-  const mockRng = {
-    nextFloat: () => 0.05,
+  let checkedProbability;
+  const luckySpecial = {
+    succeeds: (probability) => {
+      checkedProbability = probability;
+      return true;
+    },
   };
 
   const initialHp = goblin.getHp();
-  goblin.takeTurn({}, mockRng);
+  goblin.takeTurn({}, luckySpecial);
+
+  assert.strictEqual(checkedProbability, 0.1, "the luck stat is the special's chance");
 
   // Special causes goblin to take 2 self-damage
   assert.strictEqual(goblin.getHp(), initialHp - 2);
 });
 
-test("Goblin takeTurn triggers attack when luck roll is above threshold", () => {
+test("Goblin takeTurn triggers attack when the luck check fails", () => {
   const goblin = new Goblin("Goblin", 10, 3, "stumbles", "Player", "Goblin", 0.1);
-
-  // Mock RNG that returns 0.5 (which is >= 0.1, triggering attack instead)
-  const mockRng = {
-    nextFloat: () => 0.5,
-  };
+  const unluckySpecial = { succeeds: () => false };
 
   let attackCalled = false;
   goblin.attack = (target) => {
@@ -44,7 +44,7 @@ test("Goblin takeTurn triggers attack when luck roll is above threshold", () => 
   };
 
   const initialHp = goblin.getHp();
-  goblin.takeTurn({ name: "DummyPlayer" }, mockRng);
+  goblin.takeTurn({ name: "DummyPlayer" }, unluckySpecial);
 
   // HP should remain unchanged (no special self-damage) and attack should be called
   assert.strictEqual(goblin.getHp(), initialHp);
@@ -54,9 +54,9 @@ test("Goblin takeTurn triggers attack when luck roll is above threshold", () => 
 test("Goblin is defeated when its special self-damage takes it to 0 HP", () => {
   const goblin = new Goblin();
   goblin.takeDamage(8);
-  const mockRng = { nextFloat: () => 0.05 };
+  const luckySpecial = { succeeds: () => true };
 
-  goblin.takeTurn({}, mockRng);
+  goblin.takeTurn({}, luckySpecial);
 
   assert.strictEqual(goblin.getHp(), 0);
   assert.strictEqual(goblin.isAlive(), false);

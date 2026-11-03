@@ -27,8 +27,8 @@ function drawNextHand(player, deck, discard) {
   player.addCardToHand(deck.drawMultiple(3));
 }
 
-function spawnEnemy(randomizer, rng) {
-  const Enemy = randomizer.pick(Object.values(EnemyIndex), rng);
+function spawnEnemy(random) {
+  const Enemy = random.pick(Object.values(EnemyIndex));
   return new Enemy();
 }
 
@@ -51,13 +51,12 @@ export function completeEncounter({
   player,
   deck,
   discard,
-  randomizer,
-  rng,
+  random,
   events = new Observable(),
 }) {
   addRewardToDiscard(reward, discard, events);
   discardRemainingHand(player, discard);
   drawNextHand(player, deck, discard);
 
-  return spawnEnemy(randomizer, rng);
+  return spawnEnemy(random);
 }
