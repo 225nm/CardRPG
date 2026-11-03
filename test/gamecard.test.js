@@ -37,7 +37,7 @@ test("game cards can be sorted and played from a DeckLib hand", () => {
   const played = player.playCardByIndex(0, new DiscardPile());
 
   assert.equal(played.getEffect(), CardEffect.HEAL);
-  assert.equal(player.getHand().getCards().length, 1);
+  assert.equal(player.getCards().length, 1);
 });
 
 test("resolving a card with an unknown effect throws instead of doing nothing", () => {

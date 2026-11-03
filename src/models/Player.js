@@ -54,8 +54,9 @@ export class Player extends Observable {
     return this.#armour;
   }
 
-  getHand() {
-    return this.#hand;
+  // A copy, so callers can read the hand but not change it.
+  getCards() {
+    return this.#hand.getCards();
   }
 
   takeDamage(amount) {
@@ -123,6 +124,12 @@ export class Player extends Observable {
       throw new RangeError(
         `Card index must be between 0 and ${handSize - 1}, got ${index}`,
       );
+    }
+  }
+
+  discardHand(discardPile) {
+    for (const card of this.#hand.getCards()) {
+      this.#hand.playCard(card, discardPile);
     }
   }
 

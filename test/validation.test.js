@@ -48,7 +48,7 @@ test("playCardByIndex throws for an index outside the hand and leaves the hand u
   assert.throws(() => player.playCardByIndex(2, discard), RangeError);
   assert.throws(() => player.playCardByIndex(-1, discard), RangeError);
   assert.throws(() => player.playCardByIndex(undefined, discard), RangeError);
-  assert.equal(player.getHand().getCards().length, 2);
+  assert.equal(player.getCards().length, 2);
   assert.equal(discard.getPileSize(), 0);
 });
 
@@ -59,6 +59,28 @@ test("playCardByIndex plays a valid card into the discard pile", () => {
   const discard = new DiscardPile();
 
   assert.equal(player.playCardByIndex(0, discard), card);
-  assert.equal(player.getHand().getCards().length, 0);
+  assert.equal(player.getCards().length, 0);
   assert.equal(discard.getPileSize(), 1);
+});
+
+test("getCards returns a copy, so changing it does not change the hand", () => {
+  const player = new Player();
+  player.addCardToHand(GameCard.heal("2"));
+
+  const cards = player.getCards();
+  cards.push(GameCard.attack("3"));
+  cards.length = 0;
+
+  assert.equal(player.getCards().length, 1);
+});
+
+test("discardHand moves every card in the hand to the discard pile", () => {
+  const player = new Player();
+  player.addCardToHand([GameCard.heal("2"), GameCard.heal("2"), GameCard.attack("3")]);
+  const discard = new DiscardPile();
+
+  player.discardHand(discard);
+
+  assert.equal(player.getCards().length, 0);
+  assert.equal(discard.getPileSize(), 3);
 });

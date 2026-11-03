@@ -28,13 +28,9 @@ test("R1: defeating an enemy adds the selected reward to the discard pile", () =
   const reward = GameCard.attack("8");
   const discardedCards = [];
   const handCards = [{ name: "remaining card" }];
-  const hand = {
-    getCards: () => [...handCards],
-    removeCard: (card) => handCards.splice(handCards.indexOf(card), 1),
-  };
   const dealtHand = [];
   const player = {
-    getHand: () => hand,
+    discardHand: (pile) => handCards.splice(0).forEach((card) => pile.addCard(card)),
     addCardToHand: (cards) => dealtHand.push(...cards),
   };
   const discard = {
@@ -133,5 +129,5 @@ test("R4: cards apply different effects based on their suits", () => {
 
   captureConsoleOutput(() => gameLogic.resolve(GameCard.drawTwo()));
   assert.equal(cardsDrawn, 2);
-  assert.deepEqual(player.getHand().getCards(), drawnCards);
+  assert.deepEqual(player.getCards(), drawnCards);
 });

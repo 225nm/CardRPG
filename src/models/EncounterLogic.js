@@ -7,16 +7,6 @@ function addRewardToDiscard(reward, discard, events) {
   events.notify(GameEvent.REWARD_ADDED, { card: reward });
 }
 
-function discardRemainingHand(player, discard) {
-  const hand = player.getHand();
-  const remainingHand = [...hand.getCards()];
-
-  for (const card of remainingHand) {
-    hand.removeCard(card);
-    discard.addCard(card);
-  }
-}
-
 function drawNextHand(player, deck, discard) {
   if (discard.getPileSize() > 0) {
     deck.reshuffleDiscardPile(discard);
@@ -55,7 +45,7 @@ export function completeEncounter({
   events = new Observable(),
 }) {
   addRewardToDiscard(reward, discard, events);
-  discardRemainingHand(player, discard);
+  player.discardHand(discard);
   drawNextHand(player, deck, discard);
 
   return spawnEnemy(random);

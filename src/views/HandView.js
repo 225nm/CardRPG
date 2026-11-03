@@ -47,6 +47,6 @@ export class HandView {
   }
 
   #getCards() {
-    return this.#player.getHand().getCards();
+    return this.#player.getCards();
   }
 }

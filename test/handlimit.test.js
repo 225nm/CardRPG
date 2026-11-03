@@ -41,7 +41,7 @@ test("adding a 10th card to the hand throws HandFullError and keeps 9 cards", ()
   const player = createPlayerWithCards(MAX_HAND_SIZE);
 
   assert.throws(() => player.addCardToHand(GameCard.heal("2")), HandFullError);
-  assert.equal(player.getHand().getCards().length, MAX_HAND_SIZE);
+  assert.equal(player.getCards().length, MAX_HAND_SIZE);
 });
 
 test("adding several cards that would overflow the hand adds none of them", () => {
@@ -51,7 +51,7 @@ test("adding several cards that would overflow the hand adds none of them", () =
     () => player.addCardToHand([GameCard.heal("2"), GameCard.heal("3")]),
     HandFullError,
   );
-  assert.equal(player.getHand().getCards().length, 8);
+  assert.equal(player.getCards().length, 8);
 });
 
 test("drawing with a full hand throws before a card leaves the deck", () => {
@@ -71,7 +71,7 @@ test("endTurn with a full hand skips the draw and reports the full hand", () => 
   gameLogic.endTurn();
 
   assert.equal(deck.getRemaining(), 5);
-  assert.equal(player.getHand().getCards().length, MAX_HAND_SIZE);
+  assert.equal(player.getCards().length, MAX_HAND_SIZE);
   assert.deepEqual(
     events.map((event) => event.eventType),
     [GameEvent.HAND_FULL],
@@ -87,7 +87,7 @@ test("the Clubs draw stops at the card that would be the 10th", () => {
 
   gameLogic.resolve(GameCard.drawTwo());
 
-  assert.equal(player.getHand().getCards().length, MAX_HAND_SIZE);
+  assert.equal(player.getCards().length, MAX_HAND_SIZE);
   assert.equal(deck.getRemaining(), 4);
   assert.ok(events.some((event) => event.eventType === GameEvent.HAND_FULL));
 });

@@ -53,7 +53,7 @@ test("endTurn reshuffles discard pile into deck when deck is empty and discard h
 
   assert.strictEqual(reshuffledCalled, true, "reshuffleDiscardPile should be called when deck is empty");
   assert.strictEqual(drawnCalled, true, "deck.draw should be called after reshuffle");
-  const handCards = player.getHand().getCards();
+  const handCards = player.getCards();
   assert.strictEqual(handCards.length, 1, "player should receive the replacement card");
   assert.strictEqual(handCards[0].toString(), "Ace of Spades");
 });
@@ -139,5 +139,5 @@ test("playTurn continues and draws a card when both survive", () => {
   const outcome = gameLogic.playTurn(GameCard.armour("2"));
 
   assert.strictEqual(outcome, TurnOutcome.CONTINUE);
-  assert.strictEqual(player.getHand().getCards().length, 1);
+  assert.strictEqual(player.getCards().length, 1);
 });
