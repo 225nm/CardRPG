@@ -7,13 +7,16 @@ import { starterDeck } from "../models/starterDeck.js";
 import { GameLogic, TurnOutcome } from "../models/GameLogic.js";
 import { CommonCards, UncommonCards, RareCards } from "../models/Loot.js";
 import { RewardLogic } from "../models/RewardLogic.js";
-import { getSingleKey } from "../views/InputLogic.js";
-import { completeEncounter } from "../models/EncounterLogic.js";
+import {
+  recordEnemyDefeat,
+  completeEncounter,
+} from "../models/EncounterLogic.js";
 import { Observable } from "../events/Observable.js";
 import { HandView } from "../views/HandView.js";
 import { RewardView } from "../views/RewardView.js";
 
 const STARTING_HAND_SIZE = 3;
+const REWARD_CHOICES = 3;
 
 export class GameController {
   #gameLog;
@@ -52,7 +55,7 @@ export class GameController {
 
   async #playRound() {
     this.#renderBoard();
-    const cardIndex = await this.#readCardChoice();
+    const cardIndex = await this.#handView.readCardChoice();
     this.#gameLog.showTurnDivider();
 
     const card = this.#player.playCardByIndex(cardIndex, this.#discard);
@@ -74,40 +77,26 @@ export class GameController {
     this.#handView.render();
   }
 
-  async #readCardChoice() {
-    while (true) {
-      const key = await getSingleKey("\n Enter the number of the card to play: ");
-      // Base 10, -1 to properly represent index
-      const cardIndex = parseInt(key.trim(), 10) - 1;
-
-      if (this.#isCardInHand(cardIndex)) {
-        return cardIndex;
-      }
-      this.#gameLog.showInvalidCardChoice();
-    }
-  }
-
-  #isCardInHand(cardIndex) {
-    const handSize = this.#player.getHand().getCards().length;
-    return Number.isInteger(cardIndex) && cardIndex >= 0 && cardIndex < handSize;
-  }
-
   async #finishEncounter() {
-    const encounter = await completeEncounter({
-      enemy: this.#enemy,
-      enemiesDefeated: this.#enemiesDefeated,
+    this.#enemiesDefeated = recordEnemyDefeat(
+      this.#enemy,
+      this.#enemiesDefeated,
+      this.#encounterEvents,
+    );
+
+    const rewards = this.#rewardLogic.generateRewards(REWARD_CHOICES);
+    const reward = await this.#rewardView.chooseReward(rewards);
+
+    const nextEnemy = completeEncounter({
+      reward,
       player: this.#player,
       deck: this.#deck,
       discard: this.#discard,
-      rewardLogic: this.#rewardLogic,
-      rewardView: this.#rewardView,
       randomizer: this.#randomizer,
       rng: this.#rng,
       events: this.#encounterEvents,
     });
-
-    this.#enemiesDefeated = encounter.enemiesDefeated;
-    this.#startFight(encounter.enemy);
+    this.#startFight(nextEnemy);
   }
 
   #startFight(enemy) {

@@ -2,17 +2,9 @@ import { EnemyIndex } from "./Enemies/EnemyIndex.js";
 import { Observable } from "../events/Observable.js";
 import { GameEvent } from "../events/GameEvents.js";
 
-function announceEnemyDefeat(enemy, enemiesDefeated, events) {
-  enemiesDefeated++;
-  events.notify(GameEvent.ENEMY_DEFEATED, { enemy, enemiesDefeated });
-  return enemiesDefeated;
-}
-
-async function addRewardToDiscard(rewardLogic, rewardView, discard, events) {
-  const rewards = rewardLogic.generateRewards(3);
-  const selectedReward = await rewardView.chooseReward(rewards);
-  discard.addCard(selectedReward);
-  events.notify(GameEvent.REWARD_ADDED, { card: selectedReward });
+function addRewardToDiscard(reward, discard, events) {
+  discard.addCard(reward);
+  events.notify(GameEvent.REWARD_ADDED, { card: reward });
 }
 
 function discardRemainingHand(player, discard) {
@@ -40,25 +32,32 @@ function spawnEnemy(randomizer, rng) {
   return new Enemy();
 }
 
-export async function completeEncounter({
+export function recordEnemyDefeat(
   enemy,
   enemiesDefeated,
+  events = new Observable(),
+) {
+  const totalDefeated = enemiesDefeated + 1;
+  events.notify(GameEvent.ENEMY_DEFEATED, {
+    enemy,
+    enemiesDefeated: totalDefeated,
+  });
+  return totalDefeated;
+}
+
+// Adds the chosen reward, deals a fresh hand and returns the next enemy.
+export function completeEncounter({
+  reward,
   player,
   deck,
   discard,
-  rewardLogic,
-  rewardView,
   randomizer,
   rng,
   events = new Observable(),
 }) {
-  enemiesDefeated = announceEnemyDefeat(enemy, enemiesDefeated, events);
-  await addRewardToDiscard(rewardLogic, rewardView, discard, events);
+  addRewardToDiscard(reward, discard, events);
   discardRemainingHand(player, discard);
   drawNextHand(player, deck, discard);
 
-  return {
-    enemiesDefeated,
-    enemy: spawnEnemy(randomizer, rng),
-  };
+  return spawnEnemy(randomizer, rng);
 }

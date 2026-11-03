@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { Card } from "DeckLib";
 import { CombatUI } from "../src/views/CombatUI.js";
 import { EnemyIndex } from "../src/models/Enemies/EnemyIndex.js";
-import { completeEncounter } from "../src/models/EncounterLogic.js";
+import {
+  recordEnemyDefeat,
+  completeEncounter,
+} from "../src/models/EncounterLogic.js";
 import { GameLogic } from "../src/models/GameLogic.js";
 import { Player } from "../src/models/Player.js";
 
@@ -21,18 +24,7 @@ function captureConsoleOutput(run) {
   return output.join("\n");
 }
 
-async function captureAsyncConsoleOutput(run) {
-  const originalLog = console.log;
-  console.log = () => {};
-
-  try {
-    return await run();
-  } finally {
-    console.log = originalLog;
-  }
-}
-
-test("R1: defeating an enemy adds the selected reward to the discard pile", async () => {
+test("R1: defeating an enemy adds the selected reward to the discard pile", () => {
   const reward = new Card("Spades", "8");
   const discardedCards = [];
   const handCards = [{ name: "remaining card" }];
@@ -58,40 +50,30 @@ test("R1: defeating an enemy adds the selected reward to the discard pile", asyn
     shuffle: () => assert.fail("Expected the discard pile to be reshuffled"),
     drawMultiple: (amount) => Array.from({ length: amount }, () => "new card"),
   };
-  const rewardLogic = {
-    generateRewards: (amount) => {
-      assert.equal(amount, 3);
-      return [reward];
-    },
-  };
-  const rewardView = {
-    chooseReward: async (rewards) => rewards[0],
-  };
   const randomizer = {
     pick: (enemies) => enemies[0],
   };
 
-  const result = await captureAsyncConsoleOutput(() =>
-    completeEncounter({
-      enemy: new EnemyIndex.Goblin(),
-      enemiesDefeated: 0,
-      player,
-      deck,
-      discard,
-      rewardLogic,
-      rewardView,
-      randomizer,
-      rng: {},
-    }),
-  );
+  const nextEnemy = completeEncounter({
+    reward,
+    player,
+    deck,
+    discard,
+    randomizer,
+    rng: {},
+  });
 
-  assert.equal(result.enemiesDefeated, 1);
   assert.ok(discardedCards.includes(reward));
   assert.ok(discardedCards.some((card) => card.name === "remaining card"));
   assert.equal(handCards.length, 0);
   assert.equal(dealtHand.length, 3);
   assert.equal(reshuffled, true);
-  assert.ok(Object.values(EnemyIndex).some((Enemy) => result.enemy instanceof Enemy));
+  assert.ok(Object.values(EnemyIndex).some((Enemy) => nextEnemy instanceof Enemy));
+});
+
+test("R1: defeating an enemy increases the defeated count", () => {
+  assert.equal(recordEnemyDefeat(new EnemyIndex.Goblin(), 0), 1);
+  assert.equal(recordEnemyDefeat(new EnemyIndex.Knight(), 4), 5);
 });
 
 test("R2: the enemy index provides multiple distinct enemies", () => {

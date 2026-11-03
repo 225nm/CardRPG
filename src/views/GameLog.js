@@ -90,12 +90,6 @@ export class GameLog {
     console.log("\nExiting game. Thanks for playing!");
   }
 
-  showInvalidCardChoice() {
-    console.log(
-      "\n❌ Invalid choice! Please enter a valid card number corresponding to your hand.",
-    );
-  }
-
   showTurnDivider() {
     console.log("\n" + "=".repeat(40));
   }
