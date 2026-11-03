@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Card } from "DeckLib";
+import { GameCard } from "../src/models/GameCard.js";
 import { CombatUI } from "../src/views/CombatUI.js";
 import { EnemyIndex } from "../src/models/Enemies/EnemyIndex.js";
 import {
@@ -25,7 +25,7 @@ function captureConsoleOutput(run) {
 }
 
 test("R1: defeating an enemy adds the selected reward to the discard pile", () => {
-  const reward = new Card("Spades", "8");
+  const reward = GameCard.attack("8");
   const discardedCards = [];
   const handCards = [{ name: "remaining card" }];
   const hand = {
@@ -112,7 +112,7 @@ test("R4: cards apply different effects based on their suits", () => {
   captureConsoleOutput(() => player.takeDamage(5));
   const enemy = new EnemyIndex.Goblin();
   const discard = { getPileSize: () => 0 };
-  const drawnCards = [new Card("Hearts", "2"), new Card("Diamonds", "3")];
+  const drawnCards = [GameCard.heal("2"), GameCard.armour("3")];
   let cardsDrawn = 0;
   const deck = {
     remainingDeckSize: () => 5,
@@ -122,17 +122,17 @@ test("R4: cards apply different effects based on their suits", () => {
   const d6 = { roll: () => 1 };
   const gameLogic = new GameLogic(player, enemy, deck, discard, {}, d6);
 
-  captureConsoleOutput(() => gameLogic.resolve(new Card("Hearts", "3")));
+  captureConsoleOutput(() => gameLogic.resolve(GameCard.heal("3")));
   assert.equal(player.getHp(), 18);
 
-  captureConsoleOutput(() => gameLogic.resolve(new Card("Diamonds", "4")));
+  captureConsoleOutput(() => gameLogic.resolve(GameCard.armour("4")));
   assert.equal(player.getArmour(), 4);
 
   const enemyHp = enemy.getHp();
-  captureConsoleOutput(() => gameLogic.resolve(new Card("Spades", "2")));
+  captureConsoleOutput(() => gameLogic.resolve(GameCard.attack("2")));
   assert.equal(enemy.getHp(), enemyHp - 3);
 
-  captureConsoleOutput(() => gameLogic.resolve(new Card("Clubs", "2")));
+  captureConsoleOutput(() => gameLogic.resolve(GameCard.drawTwo()));
   assert.equal(cardsDrawn, 2);
   assert.deepEqual(player.getHand().getCards(), drawnCards);
 });

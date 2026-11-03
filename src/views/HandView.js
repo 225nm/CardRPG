@@ -1,4 +1,5 @@
 import { getSingleKey } from "./InputLogic.js";
+import { CardEffect } from "../models/GameCard.js";
 
 export class HandView {
   #player;
@@ -52,19 +53,17 @@ export class HandView {
   }
 
   #describeEffect(card) {
-    const rankWeight = card.getRankWeight();
+    const power = card.getPower();
 
-    switch (card.getSuit()) {
-      case "Spades":
-        return `[Physical Attack: Base ${rankWeight} + d6 roll]`;
-      case "Hearts":
-        return `[Healing: Restores ${rankWeight} HP]`;
-      case "Diamonds":
-        return `[Defense: Grants ${rankWeight} Armour]`;
-      case "Clubs":
-        return rankWeight === 2
-          ? `[Special: Draw 2 cards]`
-          : `[Special Utility]`;
+    switch (card.getEffect()) {
+      case CardEffect.ATTACK:
+        return `[Physical Attack: Base ${power} + d6 roll]`;
+      case CardEffect.HEAL:
+        return `[Healing: Restores ${power} HP]`;
+      case CardEffect.ARMOUR:
+        return `[Defense: Grants ${power} Armour]`;
+      case CardEffect.DRAW_CARDS:
+        return `[Special: Draw ${power} cards]`;
       default:
         return `[Unknown Effect]`;
     }

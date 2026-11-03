@@ -1,7 +1,7 @@
 import { Hand } from "DeckLib";
 import { Observable } from "../events/Observable.js";
 import { GameEvent } from "../events/GameEvents.js";
-import { HandFullError } from "./HandFullError.js";
+import { HandFullError } from "../errors/HandFullError.js";
 import {
   assertNonEmptyString,
   assertPositiveInteger,

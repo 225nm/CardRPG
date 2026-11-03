@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Card, DiscardPile } from "DeckLib";
+import { DiscardPile } from "DeckLib";
+import { GameCard } from "../src/models/GameCard.js";
 import { Player } from "../src/models/Player.js";
 import { Goblin } from "../src/models/Enemies/Goblin.js";
 import { Knight } from "../src/models/Enemies/Knight.js";
@@ -41,7 +42,7 @@ test("Enemy rejects luck outside the range 0 to 1", () => {
 
 test("playCardByIndex throws for an index outside the hand and leaves the hand unchanged", () => {
   const player = new Player();
-  player.addCardToHand([new Card("Hearts", "2"), new Card("Spades", "3")]);
+  player.addCardToHand([GameCard.heal("2"), GameCard.attack("3")]);
   const discard = new DiscardPile();
 
   assert.throws(() => player.playCardByIndex(2, discard), RangeError);
@@ -53,7 +54,7 @@ test("playCardByIndex throws for an index outside the hand and leaves the hand u
 
 test("playCardByIndex plays a valid card into the discard pile", () => {
   const player = new Player();
-  const card = new Card("Hearts", "2");
+  const card = GameCard.heal("2");
   player.addCardToHand(card);
   const discard = new DiscardPile();
 

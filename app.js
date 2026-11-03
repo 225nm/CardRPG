@@ -1,4 +1,4 @@
-import { QuitRequestedError } from "./src/views/InputLogic.js";
+import { QuitRequestedError } from "./src/errors/QuitRequestedError.js";
 import { GameLog } from "./src/views/GameLog.js";
 import { GameController } from "./src/controllers/GameController.js";
 

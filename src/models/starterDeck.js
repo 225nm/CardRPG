@@ -1,13 +1,13 @@
-import { Card } from "DeckLib";
+import { GameCard } from "./GameCard.js";
 
 export const starterDeck = [
-  new Card("Hearts", "2"),
-  new Card("Hearts", "3"),
-  new Card("Spades", "2"),
-  new Card("Spades", "3"),
-  new Card("Spades", "4"),
-  new Card("Diamonds", "2"),
-  new Card("Diamonds", "3"),
-  new Card("Diamonds", "4"),
-  new Card("Clubs", "2"),
+  GameCard.heal("2"),
+  GameCard.heal("3"),
+  GameCard.attack("2"),
+  GameCard.attack("3"),
+  GameCard.attack("4"),
+  GameCard.armour("2"),
+  GameCard.armour("3"),
+  GameCard.armour("4"),
+  GameCard.drawTwo(),
 ];

@@ -1,6 +1,7 @@
 import { Observable } from "../events/Observable.js";
 import { GameEvent } from "../events/GameEvents.js";
-import { HandFullError } from "./HandFullError.js";
+import { HandFullError } from "../errors/HandFullError.js";
+import { CardEffect } from "./GameCard.js";
 
 export const TurnOutcome = Object.freeze({
   CONTINUE: "continue",
@@ -54,48 +55,24 @@ export class GameLogic extends Observable {
   }
 
   resolve(card) {
-    const suit = card.getSuit();
-    const rank = card.getRank();
-    const rankWeight = card.getRankWeight();
-
+    const power = card.getPower();
     this.notify(GameEvent.CARD_RESOLVING, { card });
 
-    switch (suit) {
-      case "Spades": {
-        const roll = this.#d6.roll(this.#rng);
-        const totalPower = rankWeight + roll;
-        this.notify(GameEvent.PHYSICAL_ATTACK_ROLLED, {
-          basePower: rankWeight,
-          roll,
-          totalPower,
-        });
-        this.#enemy.takeDamage(totalPower);
+    switch (card.getEffect()) {
+      case CardEffect.ATTACK:
+        this.#attackEnemy(power);
         break;
-      }
-
-      case "Hearts": {
-        this.#player.heal(rankWeight);
+      case CardEffect.HEAL:
+        this.#player.heal(power);
         break;
-      }
-
-      case "Diamonds": {
-        this.#player.addArmour(rankWeight);
+      case CardEffect.ARMOUR:
+        this.#player.addArmour(power);
         break;
-      }
-
-      case "Clubs": {
-        if (rankWeight === 2) {
-          this.notify(GameEvent.DRAW_SPECIAL_TRIGGERED, { amount: 2 });
-          if (
-            this.#deck.remainingDeckSize() < 2 &&
-            this.#discard.getPileSize() > 0
-          ) {
-            this.#deck.reshuffleDiscardPile(this.#discard);
-          }
-          this.#drawSpecialCards(2);
-        }
+      case CardEffect.DRAW_CARDS:
+        this.#drawBonusCards(power);
         break;
-      }
+      default:
+        throw new TypeError(`Unknown card effect: ${card.getEffect()}`);
     }
   }
 
@@ -113,6 +90,28 @@ export class GameLogic extends Observable {
         this.#reportHandFull(error);
       }
     }
+  }
+
+  #attackEnemy(basePower) {
+    const roll = this.#d6.roll(this.#rng);
+    const totalPower = basePower + roll;
+    this.notify(GameEvent.PHYSICAL_ATTACK_ROLLED, {
+      basePower,
+      roll,
+      totalPower,
+    });
+    this.#enemy.takeDamage(totalPower);
+  }
+
+  #drawBonusCards(count) {
+    this.notify(GameEvent.DRAW_SPECIAL_TRIGGERED, { amount: count });
+    if (
+      this.#deck.remainingDeckSize() < count &&
+      this.#discard.getPileSize() > 0
+    ) {
+      this.#deck.reshuffleDiscardPile(this.#discard);
+    }
+    this.#drawSpecialCards(count);
   }
 
   // Draws one card at a time, so a full hand stops the draw at the card

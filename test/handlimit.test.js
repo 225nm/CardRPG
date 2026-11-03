@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Card } from "DeckLib";
+import { GameCard } from "../src/models/GameCard.js";
 import { Player } from "../src/models/Player.js";
 import { GameLogic } from "../src/models/GameLogic.js";
-import { HandFullError } from "../src/models/HandFullError.js";
+import { HandFullError } from "../src/errors/HandFullError.js";
 import { GameEvent } from "../src/events/GameEvents.js";
 import { GameLog } from "../src/views/GameLog.js";
 import { Goblin } from "../src/models/Enemies/Goblin.js";
@@ -13,7 +13,7 @@ const MAX_HAND_SIZE = 9;
 function createPlayerWithCards(cardCount) {
   const player = new Player();
   for (let i = 0; i < cardCount; i++) {
-    player.addCardToHand(new Card("Spades", "2"));
+    player.addCardToHand(GameCard.attack("2"));
   }
   return player;
 }
@@ -25,7 +25,7 @@ function createCountingDeck(cardCount) {
     remainingDeckSize: () => remaining,
     draw: () => {
       remaining--;
-      return new Card("Hearts", "3");
+      return GameCard.heal("3");
     },
     getRemaining: () => remaining,
   };
@@ -40,7 +40,7 @@ function recordEvents(subject) {
 test("adding a 10th card to the hand throws HandFullError and keeps 9 cards", () => {
   const player = createPlayerWithCards(MAX_HAND_SIZE);
 
-  assert.throws(() => player.addCardToHand(new Card("Hearts", "2")), HandFullError);
+  assert.throws(() => player.addCardToHand(GameCard.heal("2")), HandFullError);
   assert.equal(player.getHand().getCards().length, MAX_HAND_SIZE);
 });
 
@@ -48,7 +48,7 @@ test("adding several cards that would overflow the hand adds none of them", () =
   const player = createPlayerWithCards(8);
 
   assert.throws(
-    () => player.addCardToHand([new Card("Hearts", "2"), new Card("Hearts", "3")]),
+    () => player.addCardToHand([GameCard.heal("2"), GameCard.heal("3")]),
     HandFullError,
   );
   assert.equal(player.getHand().getCards().length, 8);
@@ -85,7 +85,7 @@ test("the Clubs draw stops at the card that would be the 10th", () => {
   const gameLogic = new GameLogic(player, new Goblin(), deck, { getPileSize: () => 0 }, {}, {});
   const events = recordEvents(gameLogic);
 
-  gameLogic.resolve(new Card("Clubs", "2"));
+  gameLogic.resolve(GameCard.drawTwo());
 
   assert.equal(player.getHand().getCards().length, MAX_HAND_SIZE);
   assert.equal(deck.getRemaining(), 4);

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert";
-import { Card } from "DeckLib";
+import { GameCard } from "../src/models/GameCard.js";
 import { GameLogic, TurnOutcome } from "../src/models/GameLogic.js";
 import { Player } from "../src/models/Player.js";
 import { Goblin } from "../src/models/Enemies/Goblin.js";
@@ -10,7 +10,7 @@ const alwaysSpecialRng = { nextFloat: () => 0 };
 const neverSpecialRng = { nextFloat: () => 0.99 };
 const deckWithCards = {
   isDeckEmpty: () => false,
-  draw: () => new Card("Spades", "2"),
+  draw: () => GameCard.attack("2"),
 };
 const emptyDiscard = { getPileSize: () => 0 };
 const rollsSix = { roll: () => 6 };
@@ -104,7 +104,7 @@ test("BR-2: a Goblin that defeats itself with its special ends the fight in the 
   };
   const gameLogic = new GameLogic(player, goblin, noDrawDeck, emptyDiscard, alwaysSpecialRng, rollsSix);
 
-  const outcome = gameLogic.playTurn(new Card("Hearts", "2"));
+  const outcome = gameLogic.playTurn(GameCard.heal("2"));
 
   assert.strictEqual(outcome, TurnOutcome.ENEMY_DEFEATED);
   assert.strictEqual(goblin.isAlive(), false);
@@ -118,7 +118,7 @@ test("playTurn does not let an enemy defeated by the player's card act", () => {
   };
   const gameLogic = new GameLogic(player, goblin, deckWithCards, emptyDiscard, rngThatMustNotBeUsed, rollsSix);
 
-  const outcome = gameLogic.playTurn(new Card("Spades", "4"));
+  const outcome = gameLogic.playTurn(GameCard.attack("4"));
 
   assert.strictEqual(outcome, TurnOutcome.ENEMY_DEFEATED);
   assert.strictEqual(player.getHp(), 30);
@@ -129,7 +129,7 @@ test("playTurn reports the player defeated when the enemy's attack is lethal", (
   const knight = new Knight();
   const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, alwaysSpecialRng, rollsSix);
 
-  const outcome = gameLogic.playTurn(new Card("Spades", "2"));
+  const outcome = gameLogic.playTurn(GameCard.attack("2"));
 
   assert.strictEqual(outcome, TurnOutcome.PLAYER_DEFEATED);
 });
@@ -139,7 +139,7 @@ test("playTurn continues and draws a card when both survive", () => {
   const knight = new Knight();
   const gameLogic = new GameLogic(player, knight, deckWithCards, emptyDiscard, neverSpecialRng, rollsSix);
 
-  const outcome = gameLogic.playTurn(new Card("Diamonds", "2"));
+  const outcome = gameLogic.playTurn(GameCard.armour("2"));
 
   assert.strictEqual(outcome, TurnOutcome.CONTINUE);
   assert.strictEqual(player.getHand().getCards().length, 1);
