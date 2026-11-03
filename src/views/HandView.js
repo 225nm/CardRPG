@@ -1,5 +1,5 @@
 import { getSingleKey } from "./InputLogic.js";
-import { CardEffect } from "../models/GameCard.js";
+import { describeCardWithEffect } from "./cardDescriptions.js";
 
 export class HandView {
   #player;
@@ -17,9 +17,7 @@ export class HandView {
     }
 
     cards.forEach((card, index) => {
-      console.log(
-        `  [${index + 1}] ${card.toString().padEnd(18)} -> ${this.#describeEffect(card)}`,
-      );
+      console.log(describeCardWithEffect(card, index + 1));
     });
   }
 
@@ -50,22 +48,5 @@ export class HandView {
 
   #getCards() {
     return this.#player.getHand().getCards();
-  }
-
-  #describeEffect(card) {
-    const power = card.getPower();
-
-    switch (card.getEffect()) {
-      case CardEffect.ATTACK:
-        return `[Physical Attack: Base ${power} + d6 roll]`;
-      case CardEffect.HEAL:
-        return `[Healing: Restores ${power} HP]`;
-      case CardEffect.ARMOUR:
-        return `[Defense: Grants ${power} Armour]`;
-      case CardEffect.DRAW_CARDS:
-        return `[Special: Draw ${power} cards]`;
-      default:
-        return `[Unknown Effect]`;
-    }
   }
 }

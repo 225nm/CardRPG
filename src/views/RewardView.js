@@ -1,13 +1,10 @@
 import { getSingleKey } from "./InputLogic.js";
+import { describeCardWithEffect } from "./cardDescriptions.js";
 
 export class RewardView {
   // AI assisted choice reward function.
   async chooseReward(rewards) {
-    console.log("\n🎁 Choose one reward to add to your deck:");
-
-    rewards.forEach((card, index) => {
-      console.log(`${index + 1}. ${card.toString()}`);
-    });
+    this.#showRewards(rewards);
 
     while (true) {
       const input = await getSingleKey("\nChoose 1, 2, or 3: ");
@@ -22,5 +19,12 @@ export class RewardView {
 
       console.log("Invalid choice. Please enter 1, 2, or 3.");
     }
+  }
+
+  #showRewards(rewards) {
+    console.log("\n🎁 Choose one reward to add to your deck:");
+    rewards.forEach((card, index) => {
+      console.log(describeCardWithEffect(card, index + 1));
+    });
   }
 }
